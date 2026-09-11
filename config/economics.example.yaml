@@ -1,0 +1,28 @@
+# AquaReserve - economic assumptions for the cost/ROI model.
+# All figures are indicative AUD and fully configurable.
+
+
+# opportunity value of a megalitre of reserve water
+# real discount rate
+# analysis period
+# chance of a severe-drought year (for expected returns)
+currency: "AUD"
+water_value_per_ml: 150.0     
+discount_rate: 0.07           
+horizon_years: 10             
+severe_year_probability: 0.2  
+
+
+# on-farm dam/tank build cost per m3 (5,000 /ML)
+# capacitive soil sensors + solenoid valve + LoRa node, per zone
+# LoRaWAN gateway + ESP32 edge controller + solar/battery
+# installation and commissioning
+# maintenance, comms, power
+# premium cloud features (never gates safety-critical control)
+costs:
+  storage_capex_per_m3: 5.0        
+  per_zone_hardware: 4000.0        
+  gateway: 6000.0                  
+  install: 8000.0                  
+  annual_opex: 1500.0              
+  subscription_per_year: 1200.0    
