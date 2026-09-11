@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaReserve - Farm Digital Twin (3D)</title>
+<style>
+  :root{
+    --desk:#008080; --face:#c0c0c0; --hl:#ffffff; --lt:#dfdfdf; --sh:#808080; --dk:#0a0a0a;
+    --navy1:#000080; --navy2:#1084d0; --ink:#000000; --water:#1a6fc4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--desk);color:var(--ink);
+    font-family:Tahoma,"MS Sans Serif",Geneva,Verdana,sans-serif;font-size:13px}
+  .wrap{max-width:1120px;margin:0 auto;padding:14px}
+  .window{background:var(--face);padding:3px;
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .title-bar{background:linear-gradient(90deg,var(--navy1),var(--navy2));
+    display:flex;align-items:center;justify-content:space-between;padding:4px 4px 4px 7px}
+  .title-bar-text{color:#fff;font-weight:bold;font-size:14px}
+  .window-body{padding:9px}
+  button,.btn{background:var(--face);border:0;padding:5px 13px;font-family:inherit;font-size:13px;color:#000;
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt);cursor:pointer}
+  button:active,.btn:active,.seg button.on{
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk),inset -2px -2px var(--lt),inset 2px 2px var(--sh)}
+  select{background:#fff;border:0;padding:4px 5px;font-family:inherit;font-size:13px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .toolbar label{font-size:13px}
+  .seg{display:inline-flex;gap:2px}
+  .stage-row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+  .canvas-well{flex:1;min-width:320px;background:#eef1f3;padding:2px;position:relative;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  #view3d{width:100%;height:470px;position:relative;overflow:hidden;cursor:grab}
+  #view3d.grabbing{cursor:grabbing}
+  #view3d canvas{display:block}
+  .hint{position:absolute;left:8px;bottom:7px;color:#26343f;font-size:11px;
+    background:rgba(240,244,247,0.7);padding:2px 7px;pointer-events:none;border:1px solid #b7c0c7}
+  .ramp{position:absolute;top:10px;left:10px;pointer-events:none;background:rgba(245,247,249,0.82);
+    border:1px solid #9aa6ad;padding:6px 8px;font-size:11px;color:#22303a}
+  .ramp .bar{width:16px;height:118px;margin:2px auto 4px;border:1px solid #6d7981;
+    background:linear-gradient(180deg,#3ca046,#78af3c,#d2c846,#e0963b,#c4433a)}
+  .ramp .lab{display:flex;justify-content:space-between;gap:8px}
+  .ramp .wtr{margin-top:6px;padding-top:5px;border-top:1px solid #b7c0c7}
+  .ramp .sw{display:inline-block;width:11px;height:11px;vertical-align:-1px;margin-right:5px;border:1px solid #4a5760;background:#4c85c9}
+  .side{display:flex;flex-direction:column;gap:8px;width:182px}
+  .weather,.feed{width:100%;background:var(--face);padding:9px 10px;display:flex;flex-direction:column;gap:8px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .feed{gap:6px}
+  .wx-title{font-weight:bold;font-size:13px;padding-bottom:5px;border-bottom:1px solid var(--sh)}
+  .fled{display:inline-block;width:11px;height:11px;margin-right:7px;vertical-align:middle;border:1px solid #20242c;background:#9a9a9a}
+  .fled.on{background:var(--water)}
+  .led{text-align:center;font-weight:bold;font-size:15px;letter-spacing:.06em;padding:14px 4px;color:#5a5a5a;background:#a9a9a9;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk),inset -2px -2px var(--lt),inset 2px 2px var(--sh)}
+  .led.rain{background:var(--navy2);color:#fff;text-shadow:0 0 2px #cdeaff}
+  .wx-row{display:flex;justify-content:space-between;font-size:13px}
+  .wx-row b{font-weight:bold}
+  .tl{display:flex;align-items:center;gap:10px;margin-top:8px}
+  .tl input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:20px;background:transparent}
+  .tl input[type=range]::-webkit-slider-runnable-track{height:6px;background:#8a8a8a;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk)}
+  .tl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:20px;margin-top:-7px;background:var(--face);
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .tl input[type=range]::-moz-range-track{height:6px;background:#8a8a8a}
+  .tl input[type=range]::-moz-range-thumb{width:14px;height:20px;border:0;background:var(--face);
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .play{width:36px;height:30px;padding:0;font-size:14px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-top:8px;padding:7px 9px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .swatch{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:middle;border:1px solid #20242c}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(164px,1fr));gap:8px;margin-top:10px}
+  .card{background:var(--face);padding:9px 11px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .card h3{margin:0 0 6px;font-size:12px;font-weight:bold;border-bottom:1px solid var(--sh);padding-bottom:4px}
+  .big{font-size:21px;font-weight:bold;font-variant-numeric:tabular-nums}
+  .row{display:flex;justify-content:space-between;font-size:13px;margin:3px 0}
+  .row span:last-child{font-variant-numeric:tabular-nums}
+  .dot{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:middle;border:1px solid #20242c}
+  .status-bar{display:flex;gap:3px;margin-top:8px}
+  .status-bar p{margin:0;padding:4px 8px;font-size:12px;box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh)}
+  .status-bar .grow{flex:1}
+  .sub{font-size:12px;color:#202020;margin:9px 2px 0;line-height:1.55}
+</style>
+<script src="three.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="window">
+    <div class="title-bar"><div class="title-bar-text">AquaReserve - Farm Digital Twin (3D)</div></div>
+    <div class="window-body">
+      <div class="toolbar">
+        <label>Controller</label>
+        <select id="ctrlSel"></select>
+        <label style="margin-left:6px">Season</label>
+        <div class="seg" id="yearSeg"></div>
+      </div>
+
+      <div class="stage-row">
+        <div class="canvas-well">
+          <div id="view3d"><div class="hint">Drag to orbit &middot; scroll to zoom</div></div>
+          <div class="ramp">
+            <div>Crop health</div>
+            <div class="bar"></div>
+            <div class="lab"><span>100%</span><span>0%</span></div>
+            <div class="wtr"><span class="sw"></span>water reserve</div>
+          </div>
+        </div>
+        <div class="side">
+          <div class="weather">
+            <div class="wx-title">Weather</div>
+            <div class="led" id="rainLed">DRY</div>
+            <div class="wx-row"><span>Rain</span><b><span id="wxRain">0.0</span> mm</b></div>
+            <div class="wx-row"><span>ET0 Demand</span><b><span id="wxEt0">0.0</span> mm</b></div>
+            <div class="wx-row"><span>Reserve</span><b><span id="wxRes">0.0</span> ML</b></div>
+            <div class="wx-row"><span>Rain Caught</span><b><span id="wxCap">0</span> m&sup3;</b></div>
+          </div>
+          <div class="feed">
+            <div class="wx-title">Irrigation Feed</div>
+            <div id="feedList"></div>
+            <div class="wx-row" style="border-top:1px solid var(--sh);padding-top:5px">
+              <span>Reserve Draw</span><b><span id="feedDraw">0.00</span> ML</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl">
+        <button class="play" id="playBtn" aria-label="Play">&#9654;</button>
+        <input type="range" id="slider" min="0" max="1" value="0">
+        <select id="speedSel" aria-label="Speed">
+          <option value="3">Slow</option>
+          <option value="6" selected>Normal</option>
+          <option value="12">Fast</option>
+        </select>
+      </div>
+
+      <div class="legend">
+        <span><b>Field Colour = Crop Health:</b></span>
+        <span><i class="swatch" style="background:#3ca046"></i>well watered</span>
+        <span><i class="swatch" style="background:#d2c846"></i>stressed</span>
+        <span><i class="swatch" style="background:#c4433a"></i>severe deficit</span>
+        <span><i class="swatch" style="background:#4c85c9"></i>being watered</span>
+      </div>
+
+      <div class="grid" id="cards"></div>
+
+      <div class="status-bar">
+        <p id="dateLab">Day 1</p>
+        <p class="grow" id="statusMsg">Ready</p>
+      </div>
+    </div>
+  </div>
+  <div class="sub" id="foot"></div>
+</div>
+
+<script>
+const DATA = /*__TWIN_DATA__*/null;
+(function(){
+  const {meta, runs} = DATA;
+  const st={ctrl:'mpc', year:'severe', day:0, playing:false, speed:6};
+  if(!meta.controllers.includes(st.ctrl)) st.ctrl=meta.controllers[0];
+  if(!meta.years.includes(st.year)) st.year=meta.years[0];
+  function run(){ return runs[st.ctrl+'|'+st.year]; }
+
+  const ctrlSel=document.getElementById('ctrlSel');
+  meta.controllers.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=meta.controller_labels[c]||c; ctrlSel.appendChild(o); });
+  ctrlSel.value=st.ctrl; ctrlSel.onchange=()=>{ st.ctrl=ctrlSel.value; clampDay(); shownDay=-1; };
+  const yearSeg=document.getElementById('yearSeg');
+  meta.years.forEach(y=>{ const b=document.createElement('button'); b.textContent=y[0].toUpperCase()+y.slice(1); b.dataset.y=y; b.className=(y===st.year?'on':'');
+    b.onclick=()=>{ st.year=y; [...yearSeg.children].forEach(x=>x.className=(x.dataset.y===y?'on':'')); clampDay(); shownDay=-1; }; yearSeg.appendChild(b); });
+  const slider=document.getElementById('slider'), playBtn=document.getElementById('playBtn'), speedSel=document.getElementById('speedSel');
+  slider.oninput=()=>{ st.day=+slider.value; shownDay=-1; };
+  playBtn.onclick=()=>{ st.playing=!st.playing; playBtn.innerHTML=st.playing?'&#10073;&#10073;':'&#9654;'; };
+  speedSel.onchange=()=>{ st.speed=+speedSel.value; };
+  function clampDay(){ const n=run().days; slider.max=n-1; if(st.day>n-1)st.day=n-1; slider.value=st.day; }
+
+  // ---- three.js scene ----
+  const SKY=0xcfe3ef;
+  const host=document.getElementById('view3d');
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(SKY);
+
+  // haze fades the ground to the horizon -> "infinite"
+  scene.fog=new THREE.Fog(SKY, 70, 300);          
+  const camera=new THREE.PerspectiveCamera(42,1,0.1,900);
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  host.appendChild(renderer.domElement);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9a6a, 0.95));
+  const key=new THREE.DirectionalLight(0xffffff, 0.55); key.position.set(-24,42,18); scene.add(key);
+  const fill=new THREE.DirectionalLight(0xffffff, 0.20); fill.position.set(30,20,-24); scene.add(fill);
+
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function ramp(stops,t){ t=Math.max(0,Math.min(1,t)); const s=t*(stops.length-1), i=Math.floor(s), f=s-i;
+    const a=stops[i], b=stops[Math.min(stops.length-1,i+1)];
+    return [lerp(a[0],b[0],f),lerp(a[1],b[1],f),lerp(a[2],b[2],f)]; }
+  const HEALTH=[[196,58,46],[224,150,50],[210,200,70],[120,175,60],[60,160,70]]; // 0(red)->1(green)
+  function healthRGB(ks){ if(ks==null) return [150,138,110]; return ramp(HEALTH, Math.max(0,Math.min(1,ks))); }
+  function healthCol(ks){ const c=healthRGB(ks); return new THREE.Color(c[0]/255,c[1]/255,c[2]/255); }
+
+  // Saleability band from cumulative relative yield; 
+  // horticulture (onion) has a quality floor below which produce is unmarketable, grain stays sellable until uneconomic.
+  function saleBand(rel, isHort){
+    if(rel>=0.70) return {label:'Marketable', ink:'#1e451c', dot:'#3ca046'};
+    if(rel>=(isHort?0.40:0.20)) return {label:'Reduced', ink:'#6b3f0c', dot:'#e0963b'};
+    return {label:isHort?'Unmarketable':'Failed', ink:'#6b1a17', dot:'#c4433a'};
+  }
+
+  // flat, infinite-looking ground + subtle grid
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),
+    new THREE.MeshStandardMaterial({color:0x86a04e, roughness:1}));
+  ground.rotation.x=-Math.PI/2; ground.position.y=0; scene.add(ground);
+  const grid=new THREE.GridHelper(1600, 200, 0x6f8342, 0x74883f);
+  grid.material.transparent=true; grid.material.opacity=0.22; grid.position.y=0.02; scene.add(grid);
+
+  const zones=meta.zones, n=zones.length, fw=13, fd=13, gap=3.2, soilH=0.7, nRows=7;
+  const startX=-(n*fw+(n-1)*gap)/2 + fw/2;
+  const tankX=startX+(n-1)*(fw+gap)+fw/2+16;
+  const dummy=new THREE.Object3D();
+
+  const fields=zones.map((z,i)=>{
+    const cx=startX+i*(fw+gap);
+    const soil=new THREE.Mesh(new THREE.BoxGeometry(fw, soilH, fd),
+      new THREE.MeshStandardMaterial({color:0x7a5f3a, roughness:1}));
+    soil.position.set(cx, soilH/2, 0); scene.add(soil);
+    const rowMat=new THREE.MeshStandardMaterial({color:0x4caf50, roughness:0.9, flatShading:true});
+    const rows=[];
+    for(let r=0;r<nRows;r++){ const rx=cx-fw/2+(r+0.5)*fw/nRows;
+      const m=new THREE.Mesh(new THREE.BoxGeometry(0.5,1,fd-1.2), rowMat);
+      m.position.set(rx, soilH, 0); scene.add(m); rows.push(m); }
+    const beam=new THREE.Mesh(new THREE.BoxGeometry(fw-0.6, 8, fd-1),
+      new THREE.MeshBasicMaterial({color:0x37a6ff, transparent:true, opacity:0.0, depthWrite:false}));
+    beam.position.set(cx, 4+soilH, 0); beam.visible=false; scene.add(beam);
+    return {z, cx, soil, rowMat, rows, beam};
+  });
+
+  // reserve tank (octagon, water level rises with reserve)
+  const tankR=4, tankH=8;
+  const tank=new THREE.Mesh(new THREE.CylinderGeometry(tankR,tankR,tankH,8,1,true),
+    new THREE.MeshStandardMaterial({color:0xb7bcc2, roughness:0.5, metalness:0.25, transparent:true, opacity:0.4, side:THREE.DoubleSide}));
+  tank.position.set(tankX, tankH/2, 0); scene.add(tank);
+  const tankFoot=new THREE.Mesh(new THREE.CylinderGeometry(tankR+0.3,tankR+0.5,0.5,8),
+    new THREE.MeshStandardMaterial({color:0x7d838a, roughness:0.8})); tankFoot.position.set(tankX,0.25,0); scene.add(tankFoot);
+  const water=new THREE.Mesh(new THREE.CylinderGeometry(tankR-0.2,tankR-0.2,1,8),
+    new THREE.MeshStandardMaterial({color:0x2f86d8, roughness:0.2, metalness:0.1, transparent:true, opacity:0.9}));
+  water.position.set(tankX, 0.5, 0); scene.add(water);
+
+  function makeLabel(text, big){ const W=big?256:400, H=64;
+    const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+    const tex=new THREE.CanvasTexture(c); const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, depthTest:false, depthWrite:false}));
+    spr.scale.set(big?9:11, big?2.3:1.76, 1);
+    spr.userData.draw=(t, border)=>{ x.clearRect(0,0,W,H); x.fillStyle='rgba(20,28,34,0.72)'; x.fillRect(0,0,W,H);
+      x.strokeStyle=border||'#cfe0ea'; x.lineWidth=border?5:2; x.strokeRect(2,2,W-4,H-4); x.fillStyle='#fff';
+      x.font=(big?'bold 34px':'bold 26px')+' Tahoma'; x.textAlign='center'; x.textBaseline='middle'; x.fillText(t,W/2,34); tex.needsUpdate=true; };
+    spr.userData.draw(text); return spr; }
+  fields.forEach(f=>{ f.label=makeLabel(`${f.z.label}  ${f.z.area_ha} ha`); f.label.position.set(f.cx, 3.4, fd/2+0.4); scene.add(f.label); });
+  const tankLabel=makeLabel('0.0 ML', true); tankLabel.position.set(tankX, tankH+2.6, 0); scene.add(tankLabel);
+
+  // rain
+  const RN=120, rainGeo=new THREE.BufferGeometry(), rp=new Float32Array(RN*6), rs=[];
+  for(let i=0;i<RN;i++) rs.push({x:startX-14+Math.random()*(tankX-startX+34),y:6+Math.random()*30,z:-24+Math.random()*48,v:20+Math.random()*14});
+  rainGeo.setAttribute('position',new THREE.BufferAttribute(rp,3));
+  const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0x6b95b8,transparent:true,opacity:0.5})); rain.visible=false; scene.add(rain);
+
+  // ---- camera orbit ----
+  const target=new THREE.Vector3((startX+tankX)/2, 1.5, 0);
+  let az=-0.6, pol=1.02, rad=60, dragging=false, autoRot=true, px=0, py=0;
+  function updateCam(){ const sp=Math.sin(pol), cp=Math.cos(pol);
+    camera.position.set(target.x+rad*sp*Math.sin(az), target.y+rad*cp, target.z+rad*sp*Math.cos(az)); camera.lookAt(target); }
+  host.addEventListener('pointerdown',e=>{dragging=true;autoRot=false;px=e.clientX;py=e.clientY;host.classList.add('grabbing');});
+  window.addEventListener('pointerup',()=>{dragging=false;host.classList.remove('grabbing');});
+  window.addEventListener('pointermove',e=>{ if(!dragging)return; az-=(e.clientX-px)*0.006; pol-=(e.clientY-py)*0.005; pol=Math.max(0.35,Math.min(1.4,pol)); px=e.clientX; py=e.clientY; });
+  host.addEventListener('wheel',e=>{e.preventDefault(); rad=Math.max(30,Math.min(120,rad+e.deltaY*0.05));},{passive:false});
+  function resize(){ const w=host.clientWidth, h=host.clientHeight; renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+  window.addEventListener('resize',resize);
+
+  // ---- per-day scene update ----
+  const skyN=new THREE.Color(SKY), skyW=new THREE.Color(0xb9c6cf);
+  function updateScene(){
+    const r=run(), d=st.day;
+    fields.forEach(f=>{ const zr=r.zones[f.z.id];
+      const ks=zr.ks[d], growth=zr.growth[d]||0, harvested=(d>=zr.harvest_day), irr=zr.irr[d]||0;
+      const h=harvested?0.4:(0.35+growth*2.6);
+      f.rows.forEach(m=>{ m.scale.y=h; m.position.y=soilH+h/2; });
+      f.rowMat.color.copy(harvested?new THREE.Color(0.72,0.66,0.42):healthCol(ks));
+      f.beam.visible=(!harvested && irr>0.05);
+      if(harvested){ const b=saleBand(zr.rel_yield, f.z.method==='drip');
+        f.label.userData.draw(`HARVESTED ${zr.final_yield_t_ha} t/ha (${Math.round(zr.rel_yield*100)}%)`, b.dot); }
+      else f.label.userData.draw(`${f.z.label}  ${f.z.area_ha} ha`, null);
+    });
+    const frac=r.reserve.frac[d]||0, wl=Math.max(0.05,(tankH-1)*frac);
+    water.scale.y=wl; water.position.y=0.5+wl/2;
+    tankLabel.userData.draw(`${r.reserve.vol_ml[d].toFixed(1)} ML`);
+    const raining=(r.weather.rain[d]||0)>0.2;
+    scene.background.copy(raining?skyW:skyN); scene.fog.color.copy(raining?skyW:skyN);
+    rain.visible=raining;
+    updateDOM(r,d);
+  }
+
+  // ---- DOM panels ----
+  const rainLed=document.getElementById('rainLed');
+  const wxRain=document.getElementById('wxRain'),wxEt0=document.getElementById('wxEt0'),wxRes=document.getElementById('wxRes'),wxCap=document.getElementById('wxCap');
+  const feedList=document.getElementById('feedList'),feedDraw=document.getElementById('feedDraw');
+  const cards=document.getElementById('cards'),dateLab=document.getElementById('dateLab'),statusMsg=document.getElementById('statusMsg');
+  function css(c){ return `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])})`; }
+  function updateDOM(r,d){
+    const rn=r.weather.rain[d]||0, et0=r.weather.et0[d]||0, raining=rn>0.2;
+    rainLed.textContent=raining?'RAINING':'DRY'; rainLed.className='led'+(raining?' rain':'');
+    wxRain.textContent=rn.toFixed(1); wxEt0.textContent=et0.toFixed(1);
+    wxRes.textContent=r.reserve.vol_ml[d].toFixed(1); wxCap.textContent=Math.round(r.reserve.capture_m3[d]||0);
+    let rows='';
+    meta.zones.forEach(z=>{ const mm=r.zones[z.id].irr[d]||0, active=d<r.zones[z.id].harvest_day, on=active&&mm>0.05;
+      rows+=`<div class="wx-row"><span><i class="fled${on?' on':''}"></i>${z.label}</span><b>${on?mm.toFixed(1)+' mm':(active?'idle':'done')}</b></div>`; });
+    feedList.innerHTML=rows; feedDraw.textContent=((r.reserve.withdraw_m3[d]||0)/1000).toFixed(2);
+    const s=r.summary;
+    let html=`<div class="card"><h3>Water Reserve</h3>
+      <div class="big">${r.reserve.vol_ml[d].toFixed(1)} <span style="font-size:12px">ML</span></div>
+      <div class="row"><span>Capacity</span><span>${meta.capacity_ml} ML</span></div>
+      <div class="row"><span>Drawn Today</span><span>${(r.reserve.withdraw_m3[d]/1000).toFixed(2)} ML</span></div>
+      <div class="row"><span>Survival</span><span>${s.reserve_survival_days} days</span></div></div>`;
+    meta.zones.forEach(z=>{ const zr=r.zones[z.id], ks=zr.ks[d], harv=ks==null;
+      const ksTxt=harv?'Harvested':`${Math.round(ks*100)}%`; const cc=harv?'#968a6e':css(healthRGB(ks));
+      const yTha=harv?zr.final_yield_t_ha:(zr.yield[d]||0)*z.ref_yield_t_ha, saved=yTha-(zr.rainfed_final_t_ha||0);
+      const statusRow=harv
+        ? `<div class="row"><span style="color:#1e6b1c;font-weight:bold">&#10003; Harvested</span><span>${zr.final_yield_t_ha.toFixed(1)} t/ha</span></div>`
+        : `<div class="row"><span>Projected</span><span>${((zr.yield[d]||0)*z.ref_yield_t_ha).toFixed(1)} t/ha</span></div>`;
+      const band=saleBand(zr.yield[d]||0, z.method==='drip');
+      html+=`<div class="card"><h3>${z.label}</h3>
+        <div class="row"><span><i class="dot" style="background:${cc}"></i>Health</span><span>${ksTxt}</span></div>
+        <div class="row"><span>Growth</span><span>${Math.round((zr.growth[d]||0)*100)}%</span></div>
+        ${statusRow}
+        <div class="row"><span><i class="dot" style="background:${band.dot}"></i>${harv?'Saleability':'Projected saleability'}</span><span style="color:${band.ink};font-weight:bold">${band.label}</span></div>
+        <div class="row"><span>vs rainfed</span><span style="color:${saved>0.05?'#1e6b1c':'#555'}">${saved>=0?'+':''}${saved.toFixed(1)} t/ha</span></div></div>`; });
+    const savedT=s.production_t-(s.rainfed_production_t||0), savedPct=s.rainfed_production_t>0?Math.round(100*savedT/s.rainfed_production_t):0;
+    html+=`<div class="card"><h3>Season Outcome</h3>
+      <div class="big">${s.production_t.toFixed(0)} <span style="font-size:12px">t</span></div>
+      <div class="row"><span>Rainfed (no system)</span><span>${(s.rainfed_production_t||0).toFixed(0)} t</span></div>
+      <div class="row"><span style="font-weight:bold;color:#1e6b1c">Saved by irrigation</span><span style="font-weight:bold;color:#1e6b1c">+${savedT.toFixed(0)} t (+${savedPct}%)</span></div>
+      <div class="row"><span>Irrigation used</span><span>${s.irrigation_ml.toFixed(1)} ML</span></div></div>`;
+    cards.innerHTML=html;
+    dateLab.textContent=`Day ${d+1} / ${r.days}  -  ${r.dates[d]}`;
+    statusMsg.textContent=`${meta.controller_labels[st.ctrl]}  |  ${st.year} season`;
+    slider.value=d;
+  }
+
+  // ---- loop ----
+  let shownDay=-1, t0=0;
+  function animate(t){
+    requestAnimationFrame(animate);
+    const dt=Math.min(0.05,(t-t0)/1000||0); t0=t;
+    if(st.playing){ st.acc=(st.acc||0)+dt*st.speed; while(st.acc>=1){ st.acc-=1; st.day++; if(st.day>=run().days){ st.day=run().days-1; st.playing=false; playBtn.innerHTML='&#9654;'; } } }
+    if(st.day!==shownDay){ shownDay=st.day; updateScene(); }
+    if(autoRot && !dragging) az+=dt*0.05;
+    updateCam();
+    const mp=0.10+0.07*Math.sin(t*0.005);
+    fields.forEach(f=>{ if(f.beam.visible) f.beam.material.opacity=mp; });
+    water.material.opacity=0.85+0.05*Math.sin(t*0.002);
+    if(rain.visible){ const p=rain.geometry.attributes.position.array;
+      for(let i=0;i<RN;i++){ const s2=rs[i]; s2.y-=s2.v*dt; if(s2.y<1)s2.y=32; const b=i*6;
+        p[b]=s2.x;p[b+1]=s2.y;p[b+2]=s2.z;p[b+3]=s2.x;p[b+4]=s2.y-1.3;p[b+5]=s2.z; }
+      rain.geometry.attributes.position.needsUpdate=true; }
+    renderer.render(scene,camera);
+  }
+
+  document.getElementById('foot').innerHTML =
+    `${meta.farm} - ${meta.region} - reserve ${meta.capacity_ml} ML, sown ${meta.planting}. `+
+    'Real engine output rendered in 3D (Three.js): crop rows grow through the season and are shaded by crop health, on a flat open field. '+
+    'Drag to orbit, scroll to zoom; switch controller or season and scrub the timeline.';
+
+  clampDay(); resize(); requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AquaReserve - Farm Digital Twin</title>
+<style>
+  :root{
+    --desk:#008080; --face:#c0c0c0; --hl:#ffffff; --lt:#dfdfdf; --sh:#808080; --dk:#0a0a0a;
+    --navy1:#000080; --navy2:#1084d0; --ink:#000000; --water:#1a6fc4;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--desk);color:var(--ink);
+    font-family:Tahoma,"MS Sans Serif",Geneva,Verdana,sans-serif;font-size:13px}
+  .wrap{max-width:1120px;margin:0 auto;padding:14px}
+  .window{background:var(--face);padding:3px;
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .title-bar{background:linear-gradient(90deg,var(--navy1),var(--navy2));
+    display:flex;align-items:center;justify-content:space-between;padding:3px 3px 3px 6px}
+  .title-bar-text{color:#fff;font-weight:bold;font-size:12px}
+  .title-bar-controls{display:flex;gap:2px}
+  .tbtn{width:18px;height:16px;padding:0;font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center}
+  .window-body{padding:8px}
+  button,.btn{background:var(--face);border:0;padding:5px 13px;font-family:inherit;font-size:13px;color:#000;
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt);cursor:pointer}
+  button:active,.btn:active,.seg button.on{
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk),inset -2px -2px var(--lt),inset 2px 2px var(--sh)}
+  select{background:#fff;border:0;padding:4px 5px;font-family:inherit;font-size:13px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .toolbar label{font-size:13px}
+  .seg{display:inline-flex;gap:2px}
+  .stage-row{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+  .canvas-well{flex:1;min-width:320px;background:#c0c0c0;padding:2px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  canvas#scene{width:100%;height:auto;display:block}
+  .side{display:flex;flex-direction:column;gap:8px;width:182px}
+  .weather,.feed{width:100%;background:var(--face);padding:9px 10px;display:flex;flex-direction:column;gap:8px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .feed{gap:6px}
+  .wx-title{font-weight:bold;font-size:13px;padding-bottom:5px;border-bottom:1px solid var(--sh)}
+  .fled{display:inline-block;width:11px;height:11px;margin-right:7px;vertical-align:middle;border:1px solid #20242c;background:#9a9a9a}
+  .fled.on{background:var(--water)}
+  .led{text-align:center;font-weight:bold;font-size:15px;letter-spacing:.06em;padding:14px 4px;color:#5a5a5a;background:#a9a9a9;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk),inset -2px -2px var(--lt),inset 2px 2px var(--sh)}
+  .led.rain{background:var(--navy2);color:#fff;text-shadow:0 0 2px #cdeaff}
+  .wx-row{display:flex;justify-content:space-between;font-size:13px}
+  .wx-row b{font-weight:bold}
+  .tl{display:flex;align-items:center;gap:10px;margin-top:8px}
+  .tl input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:20px;background:transparent}
+  .tl input[type=range]::-webkit-slider-runnable-track{height:6px;background:#8a8a8a;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--dk)}
+  .tl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:20px;margin-top:-7px;background:var(--face);
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .tl input[type=range]::-moz-range-track{height:6px;background:#8a8a8a}
+  .tl input[type=range]::-moz-range-thumb{width:14px;height:20px;border:0;background:var(--face);
+    box-shadow:inset -1px -1px var(--dk),inset 1px 1px var(--hl),inset -2px -2px var(--sh),inset 2px 2px var(--lt)}
+  .play{width:34px;height:28px;padding:0;font-size:13px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-top:8px;padding:7px 9px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .swatch{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:middle;border:1px solid #20242c}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(164px,1fr));gap:8px;margin-top:10px}
+  .card{background:var(--face);padding:9px 11px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh),inset -2px -2px var(--lt),inset 2px 2px var(--dk)}
+  .card h3{margin:0 0 6px;font-size:12px;font-weight:bold;border-bottom:1px solid var(--sh);padding-bottom:4px}
+  .big{font-size:21px;font-weight:bold;font-variant-numeric:tabular-nums}
+  .row{display:flex;justify-content:space-between;font-size:13px;margin:3px 0}
+  .row span:last-child{font-variant-numeric:tabular-nums}
+  .dot{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:middle;border:1px solid #20242c}
+  .status-bar{display:flex;gap:3px;margin-top:8px}
+  .status-bar p{margin:0;padding:4px 8px;font-size:12px;
+    box-shadow:inset -1px -1px var(--hl),inset 1px 1px var(--sh)}
+  .status-bar .grow{flex:1}
+  .sub{font-size:12px;color:#202020;margin:9px 2px 0;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="window">
+    <div class="title-bar">
+      <div class="title-bar-text">AquaReserve - Farm Digital Twin</div>
+    </div>
+    <div class="window-body">
+      <div class="toolbar">
+        <label>Controller</label>
+        <select id="ctrlSel"></select>
+        <label style="margin-left:6px">Season</label>
+        <div class="seg" id="yearSeg"></div>
+      </div>
+
+      <div class="stage-row">
+        <div class="canvas-well"><canvas id="scene" width="1080" height="430"></canvas></div>
+        <div class="side">
+          <div class="weather">
+            <div class="wx-title">Weather</div>
+            <div class="led" id="rainLed">DRY</div>
+            <div class="wx-row"><span>Rain</span><b><span id="wxRain">0.0</span> mm</b></div>
+            <div class="wx-row"><span>ET0 Demand</span><b><span id="wxEt0">0.0</span> mm</b></div>
+            <div class="wx-row"><span>Reserve</span><b><span id="wxRes">0.0</span> ML</b></div>
+            <div class="wx-row"><span>Rain Caught</span><b><span id="wxCap">0</span> m&sup3;</b></div>
+          </div>
+          <div class="feed">
+            <div class="wx-title">Irrigation Feed</div>
+            <div id="feedList"></div>
+            <div class="wx-row" style="border-top:1px solid var(--sh);padding-top:5px">
+              <span>Reserve Draw</span><b><span id="feedDraw">0.00</span> ML</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl">
+        <button class="play" id="playBtn" aria-label="Play">&#9654;</button>
+        <input type="range" id="slider" min="0" max="1" value="0">
+        <select id="speedSel" aria-label="Speed">
+          <option value="3">Slow</option>
+          <option value="6" selected>Normal</option>
+          <option value="12">Fast</option>
+        </select>
+      </div>
+
+      <div class="legend">
+        <span><b>Field Colour = Crop Health:</b></span>
+        <span><i class="swatch" style="background:#3fa63f"></i>well watered</span>
+        <span><i class="swatch" style="background:#e0a53b"></i>stressed</span>
+        <span><i class="swatch" style="background:#8a5a3b"></i>severe deficit</span>
+        <span><i class="swatch" style="background:#1a6fc4"></i>being watered</span>
+      </div>
+
+      <div class="grid" id="cards"></div>
+
+      <div class="status-bar">
+        <p id="dateLab">Day 1</p>
+        <p class="grow" id="statusMsg">Ready</p>
+      </div>
+    </div>
+  </div>
+  <div class="sub" id="foot"></div>
+</div>
+
+<script>
+const DATA = /*__TWIN_DATA__*/null;
+(function(){
+  const {meta, runs} = DATA;
+  const cv = document.getElementById('scene');
+  const ctx = cv.getContext('2d');
+  const st = {ctrl:'mpc', year:'severe', day:0, playing:false, speed:6, acc:0, last:0};
+  if(!meta.controllers.includes(st.ctrl)) st.ctrl=meta.controllers[0];
+  if(!meta.years.includes(st.year)) st.year=meta.years[0];
+
+  const ctrlSel = document.getElementById('ctrlSel');
+  meta.controllers.forEach(c=>{
+    const o=document.createElement('option'); o.value=c;
+    o.textContent=meta.controller_labels[c]||c; ctrlSel.appendChild(o);
+  });
+  ctrlSel.value = st.ctrl;
+  ctrlSel.onchange=()=>{ st.ctrl=ctrlSel.value; clampDay(); draw(); };
+
+  const yearSeg=document.getElementById('yearSeg');
+  meta.years.forEach(y=>{
+    const b=document.createElement('button'); b.textContent=y[0].toUpperCase()+y.slice(1);
+    b.dataset.y=y; b.className=(y===st.year?'on':'');
+    b.onclick=()=>{ st.year=y; [...yearSeg.children].forEach(x=>x.className=(x.dataset.y===y?'on':''));
+      clampDay(); draw(); };
+    yearSeg.appendChild(b);
+  });
+
+  const slider=document.getElementById('slider');
+  const playBtn=document.getElementById('playBtn');
+  const speedSel=document.getElementById('speedSel');
+  slider.oninput=()=>{ st.day=+slider.value; draw(); };
+  playBtn.onclick=()=>{ st.playing=!st.playing; playBtn.innerHTML=st.playing?'&#10073;&#10073;':'&#9654;'; };
+  speedSel.onchange=()=>{ st.speed=+speedSel.value; };
+
+  function run(){ return runs[st.ctrl+'|'+st.year]; }
+  function clampDay(){ const n=run().days; slider.max=n-1; if(st.day>n-1)st.day=n-1; slider.value=st.day; }
+
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function mix(c1,c2,t){return [lerp(c1[0],c2[0],t),lerp(c1[1],c2[1],t),lerp(c1[2],c2[2],t)];}
+  function rgb(c){return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`;}
+
+  // Saleability band from cumulative relative yield. 
+  // Horticulture (onion) has a quality floor: below it the produce is too small/poor to market. 
+  // Grain stays sellable (just less of it) until yields are uneconomic to harvest.
+  function saleBand(rel, isHort){
+    if(rel>=0.70) return {label:'Marketable', ink:'#1e451c', bg:'#cfe8c9', dot:'#3ca046'};
+    if(rel>=(isHort?0.40:0.20)) return {label:'Reduced', ink:'#6b3f0c', bg:'#f2e2c0', dot:'#e0963b'};
+    return {label:isHort?'Unmarketable':'Failed', ink:'#6b1a17', bg:'#f0cdcb', dot:'#c4433a'};
+  }
+  const GREEN=[63,166,63], YEL=[224,165,59], BROWN=[138,90,59];
+  function healthColour(ks){
+    if(ks==null) return [150,138,110];
+    if(ks>=0.85) return mix([120,150,70],GREEN, Math.min(1,(ks-0.85)/0.15));
+    if(ks>=0.5)  return mix(YEL,[120,150,70],(ks-0.5)/0.35);
+    return mix(BROWN,YEL,Math.max(0,ks/0.5));
+  }
+
+  function line(x0,y0,x1,y1,col){ ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke(); }
+  function bevel(x,y,w,h,raised){
+    const a=raised?'#ffffff':'#808080', a2=raised?'#dfdfdf':'#0a0a0a',
+          b=raised?'#0a0a0a':'#ffffff', b2=raised?'#808080':'#dfdfdf';
+    line(x,y+0.5,x+w,y+0.5,a); line(x+0.5,y,x+0.5,y+h,a);
+    line(x+w-0.5,y,x+w-0.5,y+h,b); line(x,y+h-0.5,x+w,y+h-0.5,b);
+    line(x+1,y+1.5,x+w-1,y+1.5,a2); line(x+1.5,y+1,x+1.5,y+h-1,a2);
+    line(x+w-1.5,y+1,x+w-1.5,y+h-1,b2); line(x+1,y+h-1.5,x+w-1,y+h-1.5,b2);
+  }
+
+  function scene(){
+    const W=cv.width, H=cv.height;
+    const pad=14, top=14, fieldsW=W*0.64, fieldsH=H-top-pad, left=pad;
+    const tankX=left+fieldsW+22, tankW=W-tankX-pad, tankTop=top, tankH=fieldsH;
+    return {W,H,pad,top,left,fieldsW,fieldsH,tankX,tankW,tankTop,tankH};
+  }
+
+  let flowPhase=0;
+  function draw(){
+    const r=run(), d=st.day, S=scene();
+    ctx.fillStyle='#9a8f6a'; ctx.fillRect(0,0,S.W,S.H);
+
+    meta.zones.forEach(z=>{
+      const zx=S.left+z.x*S.fieldsW, zw=z.w*S.fieldsW, zy=S.top, zh=S.fieldsH;
+      const zr=r.zones[z.id];
+      const ks=zr.ks[d], depl=zr.depl[d], growth=zr.growth[d]||0, harvested=(d>=zr.harvest_day), irr=zr.irr[d]||0;
+      const soilWet = depl==null?0.4:Math.max(0,Math.min(1,depl));
+      ctx.fillStyle=rgb(mix([150,120,72],[104,84,52],soilWet));
+      ctx.fillRect(zx,zy,zw,zh);
+      const ch=zh*(0.14+0.86*growth), cy=zy+zh-ch;
+      ctx.fillStyle=rgb(healthColour(harvested?null:ks));
+      ctx.fillRect(zx+3,cy,zw-6,ch-3);
+      ctx.strokeStyle='rgba(0,0,0,0.13)'; ctx.lineWidth=1;
+      const rows=Math.max(3,Math.round(zw/24));
+      for(let i=1;i<rows;i++){const rx=Math.round(zx+4+(zw-8)*i/rows)+0.5;
+        ctx.beginPath(); ctx.moveTo(rx,cy+4); ctx.lineTo(rx,zy+zh-26); ctx.stroke();}
+      ctx.fillStyle='rgba(0,0,0,0.35)'; ctx.fillRect(zx+4,zy+zh-20,zw-8,14);
+      const mw=(zw-8)*(depl==null?0:(1-Math.min(1,depl)));
+      ctx.fillStyle='#2f7fd0'; ctx.fillRect(zx+4,zy+zh-20,mw,14);
+      ctx.textBaseline='alphabetic';
+      ctx.fillStyle='#efe9d5'; ctx.fillRect(zx+4,zy+4,zw-8,34);
+      ctx.strokeStyle='#20242c'; ctx.lineWidth=1; ctx.strokeRect(zx+4.5,zy+4.5,zw-9,33);
+      ctx.fillStyle='#20242c'; ctx.font='bold 22px Tahoma';
+      ctx.fillText(`${z.label}  ${z.area_ha} ha`, zx+12, zy+29);
+      const tagY=zy+zh-60, tagH=34;
+      if(harvested){ ctx.font='bold 20px Tahoma';
+        const b=saleBand(zr.rel_yield, z.method==='drip');
+        const txt=`HARVESTED  ${zr.final_yield_t_ha} t/ha  (${Math.round(zr.rel_yield*100)}%)`;
+        const tagW=Math.min(zw-8, ctx.measureText(txt).width+24);
+        ctx.fillStyle=b.bg; ctx.fillRect(zx+5,tagY,tagW,tagH);
+        ctx.strokeStyle=b.ink; ctx.lineWidth=2; ctx.strokeRect(zx+6,tagY+1,tagW-2,tagH-2);
+        ctx.fillStyle=b.ink; ctx.fillText(txt, zx+16, tagY+23); }
+      const watering=(!harvested && irr>0.05);
+      if(watering){ ctx.font='bold 20px Tahoma';
+        const txt=`watering ${irr.toFixed(1)} mm`, ledW=18, padL=11, gap=9, padR=13;
+        const tagW=Math.min(zw-8, ledW+padL+gap+ctx.measureText(txt).width+padR);
+        ctx.fillStyle='#1a6fc4'; ctx.fillRect(zx+5,tagY,tagW,tagH);
+        ctx.strokeStyle='#0c3f74'; ctx.lineWidth=1; ctx.strokeRect(zx+5.5,tagY+0.5,tagW-1,tagH-1);
+        const lit=Math.sin(flowPhase*4)>-0.2, ly=tagY+(tagH-ledW)/2;
+        ctx.fillStyle=lit?'#cdeaff':'#5a95d6'; ctx.fillRect(zx+5+padL,ly,ledW,ledW);
+        ctx.strokeStyle='#0c3f74'; ctx.strokeRect(zx+5+padL+0.5,ly+0.5,ledW-1,ledW-1);
+        ctx.fillStyle='#fff'; ctx.fillText(txt, zx+5+padL+ledW+gap, tagY+23); }
+      ctx.strokeStyle=watering?'#1a6fc4':'#20242c'; ctx.lineWidth=watering?3:2;
+      ctx.strokeRect(zx+1,zy+1,zw-2,zh-2);
+    });
+
+    // reserve as a little Win98 window: navy title + sunken well
+    const tx=S.tankX,ty=S.tankTop,tw=S.tankW,th=S.tankH;
+    ctx.fillStyle='#c0c0c0'; ctx.fillRect(tx,ty,tw,th); bevel(tx,ty,tw,th,true);
+    ctx.fillStyle='#000080'; ctx.fillRect(tx+3,ty+3,tw-6,30);
+    ctx.fillStyle='#fff'; ctx.font='bold 22px Tahoma'; ctx.textBaseline='alphabetic';
+    ctx.fillText('Water Reserve', tx+10, ty+25);
+    const wx=tx+5, wy0=ty+40, ww=tw-10, wh0=th-45;
+    ctx.fillStyle='#8a8a8a'; ctx.fillRect(wx,wy0,ww,wh0); bevel(wx,wy0,ww,wh0,false);
+    const frac=r.reserve.frac[d]||0, wh=(wh0-4)*frac, wy=wy0+2+(wh0-4-wh);
+    ctx.fillStyle='#1a6fc4'; ctx.fillRect(wx+2,wy,ww-4,wh);
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1; ctx.beginPath();
+    for(let x=0;x<=ww-4;x+=6){const yy=wy+Math.sin((x/ww*6)+flowPhase)*1.6; x?ctx.lineTo(wx+2+x,yy):ctx.moveTo(wx+2+x,yy);} ctx.stroke();
+    const drawM3=r.reserve.withdraw_m3[d]||0;
+    const feedN=meta.zones.filter(z=>d<r.zones[z.id].harvest_day && (r.zones[z.id].irr[d]||0)>0.05).length;
+    const feeding=(drawM3>0 && feedN>0), cyc=wy0+wh0/2;
+    ctx.textAlign='center';
+    ctx.fillStyle='#fff'; ctx.font='bold 34px Tahoma';
+    ctx.fillText(`${r.reserve.vol_ml[d].toFixed(1)} ML`, tx+tw/2, cyc);
+    ctx.font='20px Tahoma'; ctx.fillStyle='#e6f0ff';
+    ctx.fillText(`${Math.round(frac*100)}% of ${meta.capacity_ml} ML`, tx+tw/2, cyc+28);
+    if(feeding){ const lit=Math.sin(flowPhase*4)>-0.2;
+      ctx.fillStyle=lit?'#bfe3ff':'#88b5e2'; ctx.font='bold 20px Tahoma';
+      ctx.fillText('▼ feeding '+feedN+' field'+(feedN>1?'s':''), tx+tw/2, cyc+56); }
+    ctx.textAlign='left';
+
+    updateWeather(r,d);
+    updateFeed(r,d);
+    updateCards(r,d);
+    dateLab.textContent=`Day ${d+1} / ${r.days}  -  ${r.dates[d]}`;
+    statusMsg.textContent=`${meta.controller_labels[st.ctrl]}  |  ${st.year} season`;
+    slider.value=d;
+  }
+
+  const rainLed=document.getElementById('rainLed');
+  const wxRain=document.getElementById('wxRain'), wxEt0=document.getElementById('wxEt0');
+  const wxRes=document.getElementById('wxRes'), wxCap=document.getElementById('wxCap');
+  function updateWeather(r,d){
+    const rain=r.weather.rain[d]||0, et0=r.weather.et0[d]||0, raining=rain>0.2;
+    rainLed.textContent = raining ? 'RAINING' : 'DRY';
+    rainLed.className = 'led' + (raining ? ' rain' : '');
+    wxRain.textContent = rain.toFixed(1);
+    wxEt0.textContent = et0.toFixed(1);
+    wxRes.textContent = r.reserve.vol_ml[d].toFixed(1);
+    wxCap.textContent = Math.round(r.reserve.capture_m3[d]||0);
+  }
+
+  const feedList=document.getElementById('feedList'), feedDraw=document.getElementById('feedDraw');
+  function updateFeed(r,d){
+    let rows='';
+    meta.zones.forEach(z=>{
+      const mm=r.zones[z.id].irr[d]||0, active=d<r.zones[z.id].harvest_day, on=active&&mm>0.05;
+      const val = on ? mm.toFixed(1)+' mm' : (active ? 'idle' : 'done');
+      rows+=`<div class="wx-row"><span><i class="fled${on?' on':''}"></i>${z.label}</span><b>${val}</b></div>`;
+    });
+    feedList.innerHTML=rows;
+    feedDraw.textContent=((r.reserve.withdraw_m3[d]||0)/1000).toFixed(2);
+  }
+
+  const cards=document.getElementById('cards');
+  const dateLab=document.getElementById('dateLab');
+  const statusMsg=document.getElementById('statusMsg');
+  function updateCards(r,d){
+    const s=r.summary;
+    const crops=meta.zones.map(z=>{
+      const zr=r.zones[z.id];
+      return {label:z.label, ks:zr.ks[d], grow:zr.growth[d]||0, yld:zr.yield[d]||0,
+              ref:z.ref_yield_t_ha, final:zr.final_yield_t_ha, rainfed:zr.rainfed_final_t_ha||0,
+              hort:z.method==='drip'};
+    });
+    let html=`<div class="card"><h3>Water Reserve</h3>
+      <div class="big">${r.reserve.vol_ml[d].toFixed(1)} <span style="font-size:12px">ML</span></div>
+      <div class="row"><span>Capacity</span><span>${meta.capacity_ml} ML</span></div>
+      <div class="row"><span>Drawn Today</span><span>${(r.reserve.withdraw_m3[d]/1000).toFixed(2)} ML</span></div>
+      <div class="row"><span>Survival</span><span>${s.reserve_survival_days} days</span></div></div>`;
+    crops.forEach(c=>{
+      const harv = c.ks==null;
+      const ksTxt = harv?'Harvested':`${Math.round(c.ks*100)}%`;
+      const col = harv?'#968a6e':rgb(healthColour(c.ks));
+      const yTha = harv ? c.final : (c.yld*c.ref);
+      const saved = yTha - c.rainfed;
+      const statusRow = harv
+        ? `<div class="row"><span style="color:#1e6b1c;font-weight:bold">&#10003; Harvested</span><span>${c.final.toFixed(1)} t/ha</span></div>`
+        : `<div class="row"><span>Projected</span><span>${(c.yld*c.ref).toFixed(1)} t/ha</span></div>`;
+      const band = saleBand(c.yld, c.hort);
+      html+=`<div class="card"><h3>${c.label}</h3>
+        <div class="row"><span><i class="dot" style="background:${col}"></i>Health</span><span>${ksTxt}</span></div>
+        <div class="row"><span>Growth</span><span>${Math.round(c.grow*100)}%</span></div>
+        ${statusRow}
+        <div class="row"><span><i class="dot" style="background:${band.dot}"></i>${harv?'Saleability':'Projected saleability'}</span><span style="color:${band.ink};font-weight:bold">${band.label}</span></div>
+        <div class="row"><span>vs rainfed</span><span style="color:${saved>0.05?'#1e6b1c':'#555'}">${saved>=0?'+':''}${saved.toFixed(1)} t/ha</span></div></div>`;
+    });
+    const savedT = s.production_t - (s.rainfed_production_t||0);
+    const savedPct = s.rainfed_production_t>0 ? Math.round(100*savedT/s.rainfed_production_t) : 0;
+    html+=`<div class="card"><h3>Season Outcome</h3>
+      <div class="big">${s.production_t.toFixed(0)} <span style="font-size:12px">t</span></div>
+      <div class="row"><span>Rainfed (no system)</span><span>${(s.rainfed_production_t||0).toFixed(0)} t</span></div>
+      <div class="row"><span style="font-weight:bold;color:#1e6b1c">Saved by irrigation</span><span style="font-weight:bold;color:#1e6b1c">+${savedT.toFixed(0)} t (+${savedPct}%)</span></div>
+      <div class="row"><span>Irrigation used</span><span>${s.irrigation_ml.toFixed(1)} ML</span></div></div>`;
+    cards.innerHTML=html;
+  }
+
+  function tick(t){
+    if(!st.last)st.last=t; const dt=(t-st.last)/1000; st.last=t; flowPhase+=dt*2.2;
+    if(st.playing){ st.acc+=dt*st.speed;
+      while(st.acc>=1){ st.acc-=1; st.day++; if(st.day>=run().days){ st.day=run().days-1; st.playing=false;
+        playBtn.innerHTML='&#9654;'; } }
+    }
+    draw(); requestAnimationFrame(tick);
+  }
+
+  function fit(){ const w=cv.clientWidth; cv.width=Math.max(680,Math.round(w*2)); cv.height=Math.round(cv.width*0.42); draw(); }
+  window.addEventListener('resize',fit);
+
+  document.getElementById('foot').innerHTML =
+    `${meta.farm} - ${meta.region} - reserve ${meta.capacity_ml} ML, sown ${meta.planting}. `+
+    'Real engine output (FAO-56 soil-water balance, FAO-33 yield, finite-reserve dynamics). '+
+    'Switch the controller to see how each strategy spends the shared reserve; compare a normal season against severe drought.';
+
+  clampDay(); fit(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
