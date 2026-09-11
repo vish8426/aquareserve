@@ -1,0 +1,14 @@
+# Render blueprint: one Docker web service that serves the API, the built dashboard and the twin viewers. 
+# Render injects $PORT and health-checks /api/health.
+# See https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: aquareserve
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
