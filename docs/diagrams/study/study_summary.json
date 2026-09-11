@@ -1,0 +1,73 @@
+{
+  "design_reserve_ml": 20.0,
+  "capex_aud": 126000.0,
+  "severity": {
+    "normal": {
+      "best_controller": "oracle",
+      "best_production_t": 264.8,
+      "best_saved_t": 175.1,
+      "rainfed_t": 89.7,
+      "mpc_t": 263.0
+    },
+    "moderate": {
+      "best_controller": "stochastic_mpc",
+      "best_production_t": 235.3,
+      "best_saved_t": 188.7,
+      "rainfed_t": 46.6,
+      "mpc_t": 230.7
+    },
+    "severe": {
+      "best_controller": "oracle",
+      "best_production_t": 225.7,
+      "best_saved_t": 173.5,
+      "rainfed_t": 52.2,
+      "mpc_t": 213.0
+    }
+  },
+  "reserve_sweep_mpc_severe": {
+    "5": 183.5,
+    "10": 191.1,
+    "15": 200.3,
+    "20": 213.0,
+    "25": 220.1,
+    "30": 233.4,
+    "40": 241.5
+  },
+  "economics": {
+    "threshold": {
+      "payback_years": 1.88,
+      "npv_aud": 344870.0,
+      "payback_price_minus20": 2.37,
+      "payback_price_plus20": 1.56,
+      "npv_at_disc12": 252799.0
+    },
+    "smart_rule": {
+      "payback_years": 1.89,
+      "npv_aud": 342227.0,
+      "payback_price_minus20": 2.39,
+      "payback_price_plus20": 1.56,
+      "npv_at_disc12": 250672.0
+    },
+    "mpc": {
+      "payback_years": 1.77,
+      "npv_aud": 372920.0,
+      "payback_price_minus20": 2.24,
+      "payback_price_plus20": 1.47,
+      "npv_at_disc12": 275363.0
+    },
+    "stochastic_mpc": {
+      "payback_years": 1.76,
+      "npv_aud": 375408.0,
+      "payback_price_minus20": 2.23,
+      "payback_price_plus20": 1.46,
+      "npv_at_disc12": 277365.0
+    },
+    "rl_cem": {
+      "payback_years": 1.9,
+      "npv_aud": 340446.0,
+      "payback_price_minus20": 2.4,
+      "payback_price_plus20": 1.57,
+      "npv_at_disc12": 249239.0
+    }
+  }
+}
