@@ -1,0 +1,22 @@
+digraph loop {
+  rankdir=LR; bgcolor="white"; pad=0.3; nodesep=0.45; ranksep=0.75;
+  node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled"];
+  edge [fontname="Helvetica", fontsize=9, color="#5f6b7a"];
+
+  weather [label="Weather\n(SILO ET0, rain)", fillcolor="#cfe0ff"];
+  soil    [label="Soil-water\nbalance", fillcolor="#c9e8d5"];
+  crop    [label="Crop response\n(ET_c, Ks, yield)", fillcolor="#c9e8d5"];
+  ctrl    [label="Controller\n(rule / MPC / RL)", fillcolor="#ffd9b3"];
+  reserve [label="Finite reserve\n(dam / rain / bore)", fillcolor="#bfe3ef"];
+  hardware[label="Modeled hardware\n(valves / pump)", fillcolor="#e6e6e6"];
+  metrics [label="Metrics + cost/ROI", shape=note, fillcolor="#fff3cf"];
+
+  weather -> soil;
+  soil -> crop [label="stress state"];
+  crop -> ctrl [label="stage / deficit"];
+  ctrl -> reserve [label="withdrawal request"];
+  reserve -> hardware [label="water"];
+  hardware -> soil [label="irrigation", color="#2a7de1", fontcolor="#2a7de1"];
+  crop -> metrics [label="yield", style=dashed];
+  reserve -> metrics [label="water use", style=dashed];
+}

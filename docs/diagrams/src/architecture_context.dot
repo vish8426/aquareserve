@@ -1,0 +1,18 @@
+digraph context {
+  rankdir=LR; bgcolor="white"; pad=0.3; nodesep=0.5; ranksep=0.7;
+  node [fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=9, color="#5f6b7a"];
+
+  farmer     [label="Farmer", shape=oval, style=filled, fillcolor="#e8f0fe"];
+  agronomist [label="Agronomist", shape=oval, style=filled, fillcolor="#e8f0fe"];
+  dash [label="React + TypeScript\nDashboard (ECharts)", shape=box, style="rounded,filled", fillcolor="#cfe0ff"];
+  api  [label="FastAPI service\n(run control / results)", shape=box, style="rounded,filled", fillcolor="#c9e8d5"];
+  core [label="Simulation core (Python)\nmodels / controllers /\nestimation / metrics", shape=box, style="rounded,filled", fillcolor="#ffe6c2"];
+  data [label="Config (YAML) +\nclimate data (SILO/BoM) +\nresults (Parquet/DuckDB)", shape=cylinder, style=filled, fillcolor="#ececec"];
+
+  farmer -> dash;
+  agronomist -> dash;
+  dash -> api [label="HTTP", dir=both];
+  api -> core [label="calls"];
+  core -> data [label="reads / writes"];
+}

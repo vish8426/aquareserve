@@ -1,0 +1,18 @@
+digraph container {
+  rankdir=TB; bgcolor="white"; pad=0.3; nodesep=0.5; ranksep=0.7;
+  node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled"];
+  edge [fontname="Helvetica", fontsize=9, color="#5f6b7a"];
+
+  dash    [label="Dashboard\nVite + React + TS + ECharts", fillcolor="#cfe0ff"];
+  api     [label="API service\nFastAPI + Uvicorn + DuckDB", fillcolor="#c9e8d5"];
+  core    [label="Simulation core\naquareserve (Python)", fillcolor="#ffe6c2"];
+  runner  [label="Experiment runner\n(scenario x controller matrix)", fillcolor="#ffe6c2"];
+  store   [label="Results store\nParquet + DuckDB", shape=cylinder, fillcolor="#ececec"];
+  config  [label="Config (YAML)\nfarm / crops / climate / reserve", shape=note, fillcolor="#fff3cf"];
+
+  dash -> api [label="HTTP", dir=both];
+  api -> store [label="query"];
+  runner -> core [label="drives"];
+  runner -> store [label="writes results"];
+  core -> config [label="reads", dir=back];
+}
