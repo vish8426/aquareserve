@@ -9,7 +9,6 @@ from pydantic import ValidationError
 
 from aquareserve.config import load_scenario
 from aquareserve.config.loader import load_crop_models
-
 from aquareserve.config.schema import (
     Reserve,
     ReserveStrategy,
