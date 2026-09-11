@@ -53,7 +53,7 @@ export default function App() {
       <header className="masthead">
         <div className="brandrow">
           <div className="brand">Aqua<span className="drop">Reserve</span></div>
-          <div className="brandtag">Protect your crop from drought</div>
+          <div className="brandtag">protect your crop from drought</div>
           <span className="home-link">
             {user.email}{user.role === "admin" ? " (admin)" : ""} &middot;{" "}
             <a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Sign out</a>

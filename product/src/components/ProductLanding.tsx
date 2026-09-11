@@ -55,12 +55,12 @@ export default function ProductLanding({ onConfigure }: { onConfigure: () => voi
             <div className="col" onClick={onConfigure}>
               <h3>Prove it</h3>
               <p>See the yield protected and the payback before you spend a dollar, from a validated model.</p>
-              <span className="go">See your payback &rsaquo;</span>
+              <span className="go">See your Payback &rsaquo;</span>
             </div>
             <div className="col">
               <h3>Run it</h3>
               <p>Once installed, monitor and control your zones from anywhere. Live monitoring is coming soon.</p>
-              <span className="go">Monitor (coming soon)</span>
+              <span className="go">Monitor (Coming Soon)</span>
             </div>
           </div>
         </div>

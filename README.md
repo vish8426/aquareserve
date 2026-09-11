@@ -12,13 +12,40 @@ Every component the Quantic Capstone submission requires, with its link.
 | Deliverable                           | Where it is                                                                                                                                                 |
 |---                                    |---                                                                                                                                                          |
 | Software Repository                   | [github.com/vish8426/aquareserve](https://github.com/vish8426/aquareserve) - shared with `quantic-grader`                                                   |
-| Deployed Web Application              | TBA-BEFORE-SUBMIT                                                                                                                                           |
+| Deployed Web Application              | [aquareserve-hym8.onrender.com](https://aquareserve-hym8.onrender.com) - see **Live Application** below for the two apps and the twins                      |
 | Agile Task Board                      | TBA-BEFORE-SUBMIT                                                                                                                                           |
 | Design & Testing Document             | [Word Edition](docs/AquaReserve-Design-and-Testing-Document.docx) - Markdown source: [`docs/DESIGN_AND_TESTING.md`](docs/DESIGN_AND_TESTING.md)             |
 | Recorded Demonstration (15 to 20 min) | TBA-BEFORE-SUBMIT                                                                                                                                           |
 | CI/CD Pipeline                        | [GitHub Actions](https://github.com/vish8426/aquareserve/actions/workflows/ci.yml) - lint, tests across Python 3.10 to 3.12, web app builds, Render deploy  |
 | Product Backlog (User Stories)        | [`docs/BACKLOG.md`](docs/BACKLOG.md)                                                                                                                        |
 | Comparison & Sensitivity Study        | [Word Report](docs/AquaReserve-Comparison-and-Sensitivity-Study.docx)                                                                                       |
+
+## Live Application
+Everything runs from one Render service. Free tier, so the first request after a quiet period takes about 50 seconds to wake.
+
+| What                      | Link                                                                                      | Notes                                                                                                       |
+|---                        |---                                                                                        |---                                                                                                          |
+| **Results Dashboard**     | [/](https://aquareserve-hym8.onrender.com)                                                | The deliverable - yield protection, reserve sizing, economics and the twins. No login.                      |
+| **Customer Product App**  | [/product/](https://aquareserve-hym8.onrender.com/product/)                               | The commercial layer - configurator, proposal PDF, save-a-quote and the live monitor demo. Login required.  |
+| **Digital Twin - 2D**     | [/twins/farm_twin.html](https://aquareserve-hym8.onrender.com/twins/farm_twin.html)       | Top-down season playback driven by real engine output.                                                      |
+| **Digital Twin - 3D**     | [/twins/farm_twin_3d.html](https://aquareserve-hym8.onrender.com/twins/farm_twin_3d.html) | The same season in 3D - crops grow, the reserve drains, fields are shaded by crop health.                   |
+| **API**                   | [/api/docs](https://aquareserve-hym8.onrender.com/api/docs)                               | OpenAPI docs. Health check at [`/api/health`](https://aquareserve-hym8.onrender.com/api/health).            |
+
+### Two Applications - One Deploy
+The dashboard and the product app are deliberately separate builds served by the same FastAPI process.
+
+- **`/` is the results dashboard:** This is the project deliverable - the simulation study, the controller comparison and the digital twins. It is open, so an assessor can evaluate the engineering without an account.
+- **`/product/` is the customer-facing product app:** It is the commercialization path built on top of the same validated engine, so it sits behind a login the way a real product would.
+
+### Accessing the Customer Product App
+a. Click **Create an account** to self-register. 
+  - Registration is open and instant and it exercises the real signup flow.
+
+b. An administrator account also exists, which additionally shows all saved quotes across users.
+  - email: adminuser@example.com.au
+  - password: adminpassword
+
+> Accounts are stored on an ephemeral filesystem, so self-registered accounts are cleared when the service restarts. Registering again takes a few seconds.
 
 ## Introduction
 AquaReserve is a **closed-loop digital twin** of a software-controlled supplementary irrigation system. A mid-size mixed farm holds a *limited* backup water reserve (harvested rainwater + farm dam/bore). When drought hits, releasing that water intelligently to the right zone, at the right growth stage can mean the difference between a protected harvest and a failed one.

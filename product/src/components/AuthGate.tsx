@@ -46,7 +46,7 @@ export default function AuthGate({ onAuthed }: { onAuthed: (u: User) => void }) 
       <header className="masthead">
         <div className="brandrow">
           <div className="brand">Aqua<span className="drop">Reserve</span></div>
-          <div className="brandtag">Protect your crop from drought</div>
+          <div className="brandtag">protect your crop from drought</div>
         </div>
       </header>
 
