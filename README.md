@@ -13,7 +13,7 @@ Every component the Quantic Capstone submission requires, with its link.
 |---                                    |---                                                                                                                                                          |
 | Software Repository                   | [github.com/vish8426/aquareserve](https://github.com/vish8426/aquareserve) - shared with `quantic-grader`                                                   |
 | Deployed Web Application              | [aquareserve-hym8.onrender.com](https://aquareserve-hym8.onrender.com) - see **Live Application** below for the two apps and the twins                      |
-| Agile Task Board                      | TBA-BEFORE-SUBMIT                                                                                                                                           |
+| Agile Task Board                      | [github.com/vish8426/projects](https://github.com/users/vish8426/projects/4) - shared with `quantic-grader`                                                 |
 | Design & Testing Document             | [Word Edition](docs/AquaReserve-Design-and-Testing-Document.docx) - Markdown source: [`docs/DESIGN_AND_TESTING.md`](docs/DESIGN_AND_TESTING.md)             |
 | Recorded Demonstration (15 to 20 min) | TBA-BEFORE-SUBMIT                                                                                                                                           |
 | CI/CD Pipeline                        | [GitHub Actions](https://github.com/vish8426/aquareserve/actions/workflows/ci.yml) - lint, tests across Python 3.10 to 3.12, web app builds, Render deploy  |
