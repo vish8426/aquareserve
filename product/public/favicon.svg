@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AquaReserve">
+  <title>AquaReserve</title>
+  <!-- brand-green rounded badge -->
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="#1f5136" />
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="none" stroke="#153a26" stroke-width="1" />
+  <!-- water droplet (the finite reserve that protects the crop) -->
+  <path d="M16 5 C16 5 24 15 24 20.2 A8 8 0 0 1 8 20.2 C8 15 16 5 16 5 Z"
+        fill="#7fc0e8" stroke="#2f6f9e" stroke-width="0.8" />
+  <!-- reserve level line inside the drop -->
+  <path d="M9.1 20.5 A7 7 0 0 0 22.9 20.5" fill="#4f9fd0" opacity="0.55" />
+  <!-- specular highlight -->
+  <ellipse cx="13" cy="16.5" rx="1.7" ry="3" fill="#ffffff" opacity="0.5" transform="rotate(-20 13 16.5)" />
+</svg>
