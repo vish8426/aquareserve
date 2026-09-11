@@ -18,9 +18,8 @@ if str(REPO_ROOT) not in sys.path:
 fastapi = pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
-# noqa: E402
-from backend.app.store import StoreError, get_store  
-from fastapi.testclient import TestClient  
+from backend.app.store import StoreError, get_store  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 def _store_available() -> bool:
@@ -76,27 +75,27 @@ def test_meta_shape(client: TestClient) -> None:
     assert any(z["crop"] == "onion" and z["horticulture"] for z in m["zones"])
 
     controllers = {c["id"] for c in m["controllers"]}
-    
+
     assert {"rainfed", "mpc", "oracle"} <= controllers
     assert {y["id"] for y in m["years"]} >= {"normal", "severe"}
 
 
 def test_comparison_ranked_and_saves_crops(client: TestClient) -> None:
     r = client.get("/api/comparison", params={"year": "severe", "reserve_ml": 20})
-    
+
     assert r.status_code == 200
-    
+
     rows = r.json()
-    
+
     # sorted by production, descending
     prod = [row["production_t"] for row in rows]
-    
+
     assert prod == sorted(prod, reverse=True)
-    
+
     # a controller beats rainfed under drought (proves the system protects yield)
     rainfed = next(row for row in rows if row["controller"] == "rainfed")
     best = rows[0]
-    
+
     assert best["controller"] != "rainfed"
     assert best["production_t"] > rainfed["production_t"]
     assert best["saved_t"] > 0
@@ -104,42 +103,42 @@ def test_comparison_ranked_and_saves_crops(client: TestClient) -> None:
 
 def test_reserve_sweep_monotone_context(client: TestClient) -> None:
     r = client.get("/api/reserve-sweep", params={"controller": "mpc", "year": "severe"})
-    
+
     assert r.status_code == 200
-    
+
     rows = r.json()
     caps = [row["reserve_ml"] for row in rows]
-    
+
     assert caps == sorted(caps)
-    
+
     # more storage never produces less under drought
     prod = [row["production_t"] for row in rows]
-    
+
     assert prod[-1] >= prod[0]
 
 
 def test_roi_payback_and_npv(client: TestClient) -> None:
     r = client.get("/api/roi", params={"reserve_ml": 20})
-    
+
     assert r.status_code == 200
-    
+
     roi = r.json()
-    
+
     assert roi["capex"] > 0
-    
+
     mpc = next(c for c in roi["controllers"] if c["controller"] == "mpc")
-    
+
     assert mpc["payback_years"] is not None and mpc["payback_years"] > 0
     assert mpc["npv"] > 0
 
 
 def test_matrix_filters(client: TestClient) -> None:
     r = client.get("/api/matrix", params={"year": "normal", "controller": "mpc"})
-    
+
     assert r.status_code == 200
-    
+
     rows = r.json()
-    
+
     assert rows and all(row["year"] == "normal" and row["controller"] == "mpc" for row in rows)
 
 
@@ -149,20 +148,20 @@ def auth(client: TestClient, tmp_path, monkeypatch) -> dict:
     import backend.app.auth as authmod
 
     monkeypatch.setattr(authmod, "USERS_PATH", tmp_path / "users.jsonl")
-    
+
     r = client.post(
         "/api/auth/register",
         json={"email": "grower@example.com", "password": "password123", "name": "Grower"},
     )
-    
+
     assert r.status_code == 200, r.text
-    
+
     return {"headers": {"Authorization": f"Bearer {r.json()['token']}"}}
 
 
 def test_configure_requires_auth(client: TestClient) -> None:
     r = client.post("/api/configure", json={"zones": [{"crop": "onion", "area_ha": 4}]})
-    
+
     assert r.status_code == 401
 
 
@@ -177,13 +176,13 @@ def test_configure_endpoint(client: TestClient, auth: dict) -> None:
         "existing_reserve_ml": 20,
         "has_pump": True,
     }
-    
+
     r = client.post("/api/configure", json=body, headers=auth["headers"])
-    
+
     assert r.status_code == 200
-    
+
     d = r.json()
-    
+
     assert d["design"]["reserve_ml"] == 20
     assert d["design"]["build_storage"] is False
     assert d["design"]["capex_aud"] == pytest.approx(26000.0)
@@ -200,13 +199,13 @@ def test_configure_licence_cap_flows_through(client: TestClient, auth: dict) -> 
         "has_pump": True,
         "licence_cap_ml": 15,
     }
-    
+
     r = client.post("/api/configure", json=body, headers=auth["headers"])
-    
+
     assert r.status_code == 200
-    
+
     d = r.json()
-    
+
     assert d["design"]["licence_cap_ml"] == 15
     assert d["licence"]["cap_ml"] == 15
     assert "exceeds" in (d["licence"]["note"] or "")
@@ -214,7 +213,7 @@ def test_configure_licence_cap_flows_through(client: TestClient, auth: dict) -> 
 
 def test_configure_rejects_unknown_crop(client: TestClient, auth: dict) -> None:
     r = client.post("/api/configure", json={"zones": [{"crop": "dragonfruit", "area_ha": 2}]}, headers=auth["headers"])
-    
+
     assert r.status_code == 422
 
 
@@ -224,15 +223,15 @@ def test_proposal_returns_pdf(client: TestClient, auth: dict) -> None:
         "existing_reserve_ml": 20,
         "has_pump": True,
     }
-    
+
     r = client.post("/api/proposal", json=body, headers=auth["headers"])
-    
+
     assert r.status_code == 200
     assert r.headers["content-type"] == "application/pdf"
     assert r.content[:4] == b"%PDF"
 
     # a real document
-    assert len(r.content) > 800  
+    assert len(r.content) > 800
 
 
 def test_leads_save_and_list_mine(client: TestClient, auth: dict, tmp_path, monkeypatch) -> None:
@@ -246,19 +245,19 @@ def test_leads_save_and_list_mine(client: TestClient, auth: dict, tmp_path, monk
         "contact": {"name": "Test Grower", "email": "grower@example.com", "farm": "Test Farm"},
         "summary": {"capex_aud": 118000, "payback_years": 1.8},
     }
-    
+
     r = client.post("/api/leads", json=body, headers=auth["headers"])
-    
+
     assert r.status_code == 200
-    
+
     lead_id = r.json()["id"]
-    
+
     assert lead_id
 
     mine = client.get("/api/leads/mine", headers=auth["headers"]).json()
-    
+
     match = next((x for x in mine if x["id"] == lead_id), None)
-    
+
     assert match is not None
     assert match["summary"]["capex_aud"] == 118000
     assert match["user"]["email"] == "grower@example.com"
@@ -266,7 +265,7 @@ def test_leads_save_and_list_mine(client: TestClient, auth: dict, tmp_path, monk
 
 def test_demo_decide_requires_auth(client: TestClient) -> None:
     r = client.post("/api/demo/decide", json={"moisture_pct": 20, "reserve_ml": 400})
-    
+
     assert r.status_code == 401
 
 
@@ -277,7 +276,7 @@ def test_demo_decide_waters_when_dry_and_stops_when_empty(client: TestClient, au
         json={"moisture_pct": 20, "reserve_ml": 400, "initial_reserve_ml": 400},
         headers=auth["headers"],
     ).json()
-    
+
     assert dry["watered"] is True and dry["pump_ms"] > 0
     assert dry["reserve_ml_after"] < 400
 
@@ -287,7 +286,7 @@ def test_demo_decide_waters_when_dry_and_stops_when_empty(client: TestClient, au
         json={"moisture_pct": 80, "reserve_ml": 400, "initial_reserve_ml": 400},
         headers=auth["headers"],
     ).json()
-    
+
     assert wet["watered"] is False and wet["pump_ms"] == 0
 
     # empty reserve -> the crop is left unprotected even though it is dry
@@ -296,7 +295,7 @@ def test_demo_decide_waters_when_dry_and_stops_when_empty(client: TestClient, au
         json={"moisture_pct": 20, "reserve_ml": 0, "initial_reserve_ml": 400},
         headers=auth["headers"],
     ).json()
-    
+
     assert empty["watered"] is False and empty["reserve_pct"] == 0.0
     assert "exhausted" in empty["reason"]
 
@@ -306,13 +305,13 @@ def test_demo_decide_waters_when_dry_and_stops_when_empty(client: TestClient, au
         json={"moisture_pct": 40, "reserve_ml": 400, "critical_stage": False},
         headers=auth["headers"],
     ).json()
-    
+
     critical = client.post(
         "/api/demo/decide",
         json={"moisture_pct": 40, "reserve_ml": 400, "critical_stage": True},
         headers=auth["headers"],
     ).json()
-    
+
     assert normal["watered"] is False and critical["watered"] is True
 
 
@@ -322,16 +321,16 @@ def test_login_and_me(client: TestClient, tmp_path, monkeypatch) -> None:
     monkeypatch.setattr(authmod, "USERS_PATH", tmp_path / "users.jsonl")
     client.post("/api/auth/register", json={"email": "a@b.com", "password": "password123", "name": "A"})
     bad = client.post("/api/auth/login", json={"email": "a@b.com", "password": "wrong"})
-    
+
     assert bad.status_code == 401
-    
+
     good = client.post("/api/auth/login", json={"email": "a@b.com", "password": "password123"})
-    
+
     assert good.status_code == 200
-    
+
     token = good.json()["token"]
     me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
-    
+
     assert me.status_code == 200
     assert me.json()["email"] == "a@b.com" and me.json()["role"] == "customer"
 
@@ -341,7 +340,7 @@ def test_register_requires_name(client: TestClient, tmp_path, monkeypatch) -> No
 
     monkeypatch.setattr(authmod, "USERS_PATH", tmp_path / "users.jsonl")
     r = client.post("/api/auth/register", json={"email": "n@e.com", "password": "password123", "name": "  "})
-    
+
     assert r.status_code == 409
     assert "name" in r.json()["detail"].lower()
 

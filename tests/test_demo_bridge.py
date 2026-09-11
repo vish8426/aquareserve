@@ -15,8 +15,7 @@ if str(REPO_ROOT / "src") not in sys.path:
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 
-# noqa: E402
-from fastapi.testclient import TestClient  
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 def _load_bridge():
@@ -26,7 +25,7 @@ def _load_bridge():
     assert spec and spec.loader
 
     # so dataclasses can resolve string annotations
-    sys.modules[spec.name] = mod  
+    sys.modules[spec.name] = mod
     spec.loader.exec_module(mod)
 
     return mod
@@ -52,7 +51,7 @@ def test_waters_when_dry_and_spends_reserve(client: TestClient) -> None:
     assert d["pump_ms"] > 0
 
     # the reserve was spent
-    assert d["reserve_ml_after"] < 100  
+    assert d["reserve_ml_after"] < 100
 
 
 def test_no_water_when_moist(client: TestClient) -> None:
@@ -85,7 +84,7 @@ def test_reserve_exhausts_and_watering_stops(client: TestClient) -> None:
             break
 
     final = client.post("/demo/decide", json={"zone": "tray-1", "moisture_pct": 5}).json()
-    
+
     assert final["pump_ms"] == 0
     assert "exhausted" in final["reason"]
     assert final["reserve_pct"] == 0.0

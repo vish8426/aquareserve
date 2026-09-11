@@ -187,7 +187,7 @@ function Actions({ result, req }: { result: ConfigureResult; req: ConfigureReque
     }
     try {
 
-      const r = await api.saveLead({ \
+      const r = await api.saveLead({
         ...req,
         contact: { name, email, farm: farm || undefined },
         summary: {

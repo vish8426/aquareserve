@@ -15,7 +15,6 @@ import pandas as pd
 
 from ..config.schema import Scenario
 from ..controllers.base import Controller, ZoneControlContext
-
 from ..models import (
     CropCurve,
     ReserveModel,
@@ -24,7 +23,6 @@ from ..models import (
     YieldResult,
     taw_from_soil,
 )
-
 from ..weather import columns as C
 
 _M3_PER_MM_HA = 10.0

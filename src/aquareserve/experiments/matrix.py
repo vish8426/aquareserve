@@ -14,7 +14,6 @@ from pathlib import Path
 import pandas as pd
 
 from ..config.schema import Scenario
-
 from ..controllers import (
     MPCController,
     OracleController,
@@ -23,7 +22,6 @@ from ..controllers import (
     StochasticMPCController,
     ThresholdController,
 )
-
 from ..metrics import compute_metrics
 from ..rl import LinearPolicyController
 from ..simulation import SimulationEngine

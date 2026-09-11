@@ -12,10 +12,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "src"))
 
-# noqa: E402
-import aquareserve.configurator.core as core  
-
-from aquareserve.configurator import (  
+import aquareserve.configurator.core as core  # noqa: E402
+from aquareserve.configurator import (  # noqa: E402
     FarmProfile,
     ZoneInput,
     annual_recurring,
@@ -83,13 +81,13 @@ def test_configure_existing_reserve_no_storage():
 
     # onion (drip horticulture) is marketable
     onion = r["outcome"]["crops"]["onion"]
-    
+
     assert onion["horticulture"] and onion["marketable"]
 
 
 def test_recommend_maximises_npv(monkeypatch):
     # keep the test quick
-    monkeypatch.setattr(core, "SIZING_CANDIDATES_ML", [10, 20])  
+    monkeypatch.setattr(core, "SIZING_CANDIDATES_ML", [10, 20])
     r = configure(FarmProfile(zones=MODEL_ZONES, has_pump=True))
 
     assert r["design"]["reserve_ml"] in (10, 20)
@@ -104,7 +102,7 @@ def test_recommend_maximises_npv(monkeypatch):
 
 
 def test_licence_cap_binds_and_reports_forgone(monkeypatch):
-    # a licence below the NPV-optimal size hard-caps the recommendation 
+    # a licence below the NPV-optimal size hard-caps the recommendation
     monkeypatch.setattr(core, "SIZING_CANDIDATES_ML", [20])
     r = configure(FarmProfile(zones=MODEL_ZONES, has_pump=True, licence_cap_ml=10))
 
@@ -136,7 +134,7 @@ def test_licence_note_when_existing_reserve_exceeds_licence():
     # fast path (existing reserve): a licence below the existing reserve is flagged, not capped
     prof = FarmProfile(zones=MODEL_ZONES, existing_reserve_ml=20, has_pump=True, licence_cap_ml=15)
     r = configure(prof)
-    
+
     assert r["design"]["licence_capped"] is False
     assert r["licence"]["cap_ml"] == 15
     assert r["licence"]["note"] and "exceeds" in r["licence"]["note"]

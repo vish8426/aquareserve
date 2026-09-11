@@ -20,7 +20,7 @@ from ..models import ReserveModel
 from ._pretrained import PRETRAINED_WEIGHTS
 
 # re-exported for callers
-from .base_features import N_FEATURES  
+from .base_features import N_FEATURES
 
 __all__ = ["LinearPolicyController", "N_FEATURES"]
 
