@@ -1,0 +1,43 @@
+# AquaReserve - climate configuration.
+# Region: Victorian Mallee (Mildura). Daily historical data from SILO (Queensland Government / Longpaddock), which provides FAO-56 ET0 alongside rainfall and temperature. 
+# Drought scenarios are injected by scaling the historical record.
+
+region: "Victorian Mallee, Australia"
+
+dataset:
+  source: "silo"
+  station_or_grid: "Mildura"
+  latitude: -34.24
+  longitude: 142.08
+  # FAO-56 short-crop reference ET (mm/day).
+  variables:
+    - "rain"
+    - "et0"          
+    - "max_temp"
+    - "min_temp"
+    - "radiation"
+    - "vapour_pressure"
+  # Committed real SILO fao56 record (2000 + 2019); synthetic fallback if absent.
+  path: "data/silo_mildura.txt"   
+
+period:
+# Base-year anchor; real years pinned per scenario are re-based onto it.
+  start: "2000-01-01"
+  end: "2000-12-31"   
+
+# Scenarios now use real contrasting SILO years where possible: a scenario with a `year` pulls that real year's daily record (re-based onto the base year so planting and the season window are unchanged). 
+# Rainfall_multiplier/et0_multiplier are a synthetic fallback used only when the pinned year is not present in the data file.
+drought_scenarios:
+  - name: "normal"
+    rainfall_multiplier: 1.00
+    et0_multiplier: 1.00
+    description: "Real 2000 Mildura season (unperturbed historical record)."
+  - name: "moderate"
+    rainfall_multiplier: 0.70
+    et0_multiplier: 1.10
+    description: "Synthetic moderate drought: 30% rainfall reduction, elevated demand."
+  - name: "severe"
+    year: 2019
+    rainfall_multiplier: 0.40
+    et0_multiplier: 1.25
+    description: "Real 2019 Mildura drought season (about 90 mm growing-season rain)."

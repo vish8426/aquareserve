@@ -1,0 +1,30 @@
+# AquaReserve - finite backup water store
+# Deliberately constrained: it cannot fully irrigate every zone every season.
+# That scarcity is what makes intelligent release worthwhile.
+#
+# Volumes in cubic metres (m3). 1 ML = 1000 m3. 1 mm over 1 ha = 10 m3.
+
+# 20 ML total storage
+# 12 ML at season start
+name: "farm_reserve"
+capacity_m3: 20000.0          
+initial_volume_m3: 12000.0    
+
+# Open-water evaporation from the dam surface (applied in reserve dynamics)
+surface_area_m2: 4000.0
+pan_coefficient: 0.7
+
+sources:
+  - type: "farm_dam"
+    initial_volume_m3: 9000.0
+
+  - type: "rainwater_harvest"
+    initial_volume_m3: 3000.0
+    # shed roof + hardstand
+    catchment_area_m2: 6000.0   
+    runoff_coefficient: 0.80
+
+  - type: "bore"
+    initial_volume_m3: 0.0
+    # limited licensed allocation
+    daily_inflow_m3: 50.0        

@@ -1,0 +1,41 @@
+# Onion - FAO-56 / FAO-33 parameter pack (shallow-rooted horticulture, drip)
+# Sources: FAO Irrigation & Drainage Paper 56 (Kc), Paper 33 (Ky).
+
+name: "onion"
+display_name: "Onion"
+
+kc:
+  initial: 0.70
+  mid: 1.05
+  end: 0.75
+
+# Bulb onion ~150-day cycle.
+stage_days:
+  initial: 15
+  development: 25
+  mid: 70
+  late: 40
+
+# Shallow root system - sensitive to short dry spells.
+root_depth:
+  initial_m: 0.15
+  max_m: 0.50
+
+# Stress-intolerant across the whole cycle; bulb formation (mid) most critical.
+yield_response:
+  seasonal: 1.10
+  by_stage:
+    initial: 0.45
+    development: 0.60
+    # bulb formation
+    mid: 1.10        
+    late: 0.45
+
+# low p: irrigate before much depletion
+depletion_fraction_p: 0.30          
+seasonal_water_need_mm: [350.0, 550.0]
+reference_yield_t_per_ha: 50.0
+
+# AUD/t farmgate (indicative, configurable)
+price_per_t: 450.0                  
+notes: "High value, small area. Near-full backup justified. Shallow roots, low stress tolerance."

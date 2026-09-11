@@ -1,0 +1,36 @@
+# Barley - FAO-56 / FAO-33 parameter pack (winter cereal, drought-tolerant)
+# Sources: FAO Irrigation & Drainage Paper 56 (Kc), Paper 33 (Ky).
+
+name: "barley"
+display_name: "Barley"
+
+kc:
+  initial: 0.30
+  mid: 1.15
+  end: 0.25
+
+# Shorter season than wheat; more drought-tolerant.
+stage_days:
+  initial: 25
+  development: 50
+  mid: 50
+  late: 35
+
+root_depth:
+  initial_m: 0.30
+  max_m: 1.20
+
+# Sensitive stages: tillering (development) and grain fill (mid).
+yield_response:
+  seasonal: 1.00
+  by_stage:
+    initial: 0.20
+    development: 0.60   # tillering
+    mid: 0.90           # grain fill
+    late: 0.40
+
+depletion_fraction_p: 0.55
+seasonal_water_need_mm: [300.0, 450.0]
+reference_yield_t_per_ha: 4.5
+price_per_t: 300.0          # AUD/t farmgate (indicative, configurable)
+notes: "Drought-tolerant. Sensitive at tillering and grain fill. Critical-stage deficit."

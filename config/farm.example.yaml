@@ -1,0 +1,65 @@
+# AquaReserve - example farm scenario
+# Mixed mid-size demonstration farm in the Victorian Mallee (Australian wheat-belt).
+# All numbers here are configurable; this file is the default validation case.
+
+name: "Mallee Mixed Demonstration Farm"
+
+location:
+  region: "Victorian Mallee, Australia"
+  latitude: -34.24
+  longitude: 142.08
+  elevation_m: 50.0
+
+# Finite backup water store. 
+# Loaded from a separate file so reserve sizing can be swept independently of the farm layout in experiments.
+reserve_ref: "reserve.example.yaml"
+
+zones:
+  - id: "onion-1"
+    crop: "onion"
+    area_ha: 4.0
+    irrigation_system: "drip"
+    # high value, small area, stress-intolerant
+    strategy: "near_full_backup"
+    # drip is efficient        
+    irrigation_efficiency: 0.90          
+    max_application_rate_mm_per_day: 12.0
+    soil:
+      name: "mallee_loam"
+      field_capacity: 0.26
+      wilting_point: 0.11
+      total_available_water_mm_per_m: 110.0
+      initial_depletion_fraction: 0.25
+
+  - id: "wheat-1"
+    crop: "wheat"
+    area_ha: 12.0
+    irrigation_system: "broadacre_sprinkler"
+    # protect anthesis + grain fill only
+    strategy: "critical_stage_deficit"   
+    irrigation_efficiency: 0.80
+    max_application_rate_mm_per_day: 20.0
+    soil:
+      name: "mallee_sandy_loam"
+      field_capacity: 0.24
+      wilting_point: 0.10
+      # low PAWC typical of Mallee sands
+      total_available_water_mm_per_m: 95.0   
+      # partly-dry profile after summer fallow
+      initial_depletion_fraction: 0.55        
+
+  - id: "barley-1"
+    crop: "barley"
+    area_ha: 8.0
+    irrigation_system: "broadacre_sprinkler"
+    strategy: "critical_stage_deficit"
+    irrigation_efficiency: 0.80
+    max_application_rate_mm_per_day: 20.0
+    soil:
+      name: "mallee_sandy_loam"
+      field_capacity: 0.24
+      wilting_point: 0.10
+      # low PAWC typical of Mallee sands
+      total_available_water_mm_per_m: 95.0
+      # partly-dry profile after summer fallow   
+      initial_depletion_fraction: 0.55        

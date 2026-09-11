@@ -1,0 +1,46 @@
+# Wheat - FAO-56 / FAO-33 parameter pack (winter cereal, broadacre)
+# Sources: FAO Irrigation & Drainage Paper 56 (Kc), Paper 33 (Ky).
+# Refine against local agronomy during calibration.
+
+name: "wheat"
+display_name: "Wheat"
+
+# FAO-56 single crop coefficient at the three anchor points.
+kc:
+  initial: 0.30
+  mid: 1.15
+  end: 0.40
+
+# Growth-stage lengths (days). 
+# Winter wheat sown ~May, harvested ~Nov/Dec.
+stage_days:
+  initial: 30
+  development: 60
+  mid: 60
+  late: 40
+
+root_depth:
+  initial_m: 0.30
+  max_m: 1.50
+
+# FAO-33 yield response. 
+# Anthesis (mid) is the most water-sensitive stage.
+yield_response:
+  seasonal: 1.05
+  by_stage:
+    initial: 0.20
+    development: 0.50
+    # anthesis / flowering - protect this above all.
+    mid: 1.05
+    # grain fill        
+    late: 0.40       
+
+# FAO-56 p (fraction of TAW before stress).
+depletion_fraction_p: 0.55          
+seasonal_water_need_mm: [450.0, 650.0]
+reference_yield_t_per_ha: 5.0
+
+# AUD/t farmgate (indicative, configurable).
+# Well-watered potential.
+price_per_t: 320.0          
+notes: "Critical stages: anthesis and grain fill. Strategy: critical-stage deficit."
