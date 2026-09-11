@@ -1,0 +1,48 @@
+# AquaReserve hardware Bill of Materials - machine-readable single source of truth.
+#
+#
+# This mirrors docs/AquaReserve-Hardware-BOM.xlsx so the configurator, the spreadsheet and the economics model never drift apart. 
+# Costs are indicative AUD for planning, not supplier quotes.
+#
+#
+# By construction the medium case (3 zones, 20 ML new build) totals the modeled ~126,000 capex:
+#   per-zone 4,000 x 3 + central 6,000 + install 8,000 + storage 20 ML x 5,000 = 126,000.
+
+currency: "AUD"
+
+# Cost per independently controlled crop zone (multiplied by the zone count).
+per_zone_kit:
+  - { item: "Capacitive soil-moisture probe", type: "COTS", unit_cost: 900 }
+  - { item: "Latching solenoid valve (50 mm)", type: "COTS", unit_cost: 350 }
+  - { item: "AquaReserve control node (ESP32 + LoRa + valve driver, IP67)", type: "Assembled", unit_cost: 700 }
+  - { item: "Solar panel + battery (node)", type: "COTS", unit_cost: 450 }
+  - { item: "Inline flow meter (per zone)", type: "COTS", unit_cost: 600 }
+  - { item: "Zone install kit (mounting, cabling, contingency)", type: "COTS", unit_cost: 1000 }
+
+# One central kit per site.
+central_kit:
+  - { item: "LoRaWAN gateway (AS923)", type: "COTS", unit_cost: 2500 }
+  - { item: "AquaReserve edge / site controller (industrial)", type: "Assembled", unit_cost: 1500 }
+  - { item: "Reserve level sensor + main flow meter", type: "COTS", unit_cost: 900 }
+  - { item: "Site power + weatherproof cabinet", type: "COTS", unit_cost: 1100 }
+
+# Added only when the farm has no existing pump.
+optional_pump:
+  item: "Pump VFD / soft-starter"
+  type: "COTS"
+  unit_cost: 3500
+
+# Reserve build (lined dam or tank). 
+# Charged only when a new reserve is built; existing dams make this zero, which is the software-vs-storage argument in the study.
+storage_capex_per_ml: 5000
+
+# Installation and commissioning lump, by zone count (scales with site complexity).
+install_by_zones:
+  - { max_zones: 2, cost: 6000 }
+  - { max_zones: 3, cost: 8000 }
+  - { max_zones: 99, cost: 12000 }
+
+# Recurring annual operating costs (not capex). Safety-critical control is never gated by the subscription.
+recurring_annual:
+  - { item: "AquaReserve subscription (optimization + control)", unit_cost: 1200 }
+  - { item: "Maintenance, comms and power", unit_cost: 1500 }
