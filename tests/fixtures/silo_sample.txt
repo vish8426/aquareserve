@@ -1,0 +1,70 @@
+"19970526" 365 26/05/1997 -99.9 999 -99.9 999 9999.9 999 999.9 999 999.9  999 999.9 999 9999.9 9999.9 9999.9"
+""
+" This file is SPACE DELIMITED for easy import into both spreadsheets and programs."
+"The first line 19970526 contains dummy data and is provided to allow spreadsheets to sense the columns"
+" To read into a spreadsheet select DELIMITED and SPACE."
+" "
+" "
+"=========  The following essential information and notes should be kept in the data file =========="
+" "
+"The Patched Point Data system is constructed from observational data obtained from the Bureau of Meteorology and other suppliers "
+"and is freely available under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. Under this licence users can copy, modify, and redistribute the data, provided they acknowledge SILO as the data source and indicate if any changes were made to the data."
+" "
+"Notes:"
+" * Patched Point data for station: 76031 MILDURA AIRPORT                          Lat: -34.2358 Long:  142.0867"
+" * Elevation: 50 m "
+" * Extracted from Silo 'BoM Only' dataset on 20260707 "
+" * Please read the documentation on the Patched Point Data, http://www.longpaddock.qld.gov.au/silo"
+" "
+" * As evaporation is read at 9am, it has been shifted to the day before"
+"    ie The evaporation measured on 20 April is in row for 19 April"
+" * The 6 Source columns Smx, Smn, Srn, Sev, Ssl, Svp indicate the source of the data to their left, namely Max temp, Min temp, Rainfall, Evaporation, Radiation and Vapour Pressure respectively"
+" "
+"    0 = Station data, as supplied by Bureau, 23 = Nearby station, data from BoM"
+"   13 = Deaccumulated using nearby station,  15 = Deaccumulated using interpolated data"
+" "
+"   25 = interpolated daily observations,     75 = interpolated long term average"
+" "
+" * Relative Humidity has been calculated using 9am VP, T.Max and T.Min"
+"   RHmaxT is estimated Relative Humidity at Temperature T.Max"
+"   RHminT is estimated Relative Humidity at Temperature T.Min"
+" * FAO56 = Potential Evapotranspiration calculated using the FAO Penman-Monteith formula as in"
+"   FAO Irrigation and Drainage paper 56,  http://www.fao.org/docrep/X0490E/X0490E00.htm"
+" * As the evapotranspiration has been calculated from other data, particularly, Tmax, Tmin, Rad, and VP,"
+"   its accuracy and source code are dependant on the source and accuracy of the data in those columns."
+" * The accuracy of the data depends on many factors including date, location, and variable."
+"   For consistency data is supplied using one decimal place, however it is not accurate to that precision."
+"   Further information is available from http://www.longpaddock.qld.gov.au/silo"
+"===================================================================================================="
+" "
+Date       Day Date2      T.Max Smx T.Min Smn Rain   Srn  Evap Sev Radn   Ssl VP    Svp RHmaxT RHminT  FAO56
+(yyyymmdd)  () (ddmmyyyy)  (oC)  ()  (oC)  ()   (mm)  ()  (mm)  () (MJ/m2) () (hPa)  ()   (%)    (%)    (mm)
+20000101     1  1-01-2000  24.9   0  10.7   0    0.0   0   8.0   0  31.9   25   8.8   0   28.0   68.4    6.1
+20000102     2  2-01-2000  30.9   0  12.5   0    0.0   0   8.8   0  33.0   42  10.9   0   24.4   75.3    7.2
+20000103     3  3-01-2000  34.8   0  17.7   0    0.0   0  13.4   0  30.5   42  11.0   0   19.8   54.3    7.8
+20000104     4  4-01-2000  24.3   0  13.0   0    0.0   0   9.8   0  34.5   42   8.4   0   27.7   56.1    6.6
+20000105     5  5-01-2000  25.6   0   9.7   0    0.0   0  11.9   0  34.5   42   7.7   0   23.5   64.0    6.6
+20000106     6  6-01-2000  26.7   0  11.9   0    0.0   0   9.4   0  34.6   42   9.9   0   28.3   71.1    6.8
+20000107     7  7-01-2000  28.3   0  13.0   0    0.0   0   8.0   0  33.1   42  11.4   0   29.6   76.2    6.7
+20000108     8  8-01-2000  31.8   0  13.2   0    0.0   0  10.0   0  32.8   42  12.7   0   27.0   83.8    7.2
+20000109     9  9-01-2000  34.6   0  18.6   0    0.0   0   7.6   0  23.3   42   9.8   0   17.8   45.8    7.0
+20000110    10 10-01-2000  35.8   0  18.4   0    0.0   0  11.0   0  30.9   42  12.9   0   22.0   61.0    7.9
+20000111    11 11-01-2000  36.3   0  19.2   0    0.0   0  15.0   0  30.4   42  13.6   0   22.5   61.2    7.9
+20000112    12 12-01-2000  33.9   0  19.0   0    0.0   0  10.6   0  33.5   42  11.3   0   21.4   51.5    8.1
+20000113    13 13-01-2000  35.1   0  19.3   0    0.0   0  13.4   0  32.0   42  11.9   0   21.0   53.2    8.0
+20000114    14 14-01-2000  35.7   0  17.1   0    0.0   0  12.0   0  32.0   42  10.1   0   17.3   51.8    8.1
+20000115    15 15-01-2000  36.8   0  20.7   0    0.0   0  12.6   0  31.6   42  10.4   0   16.8   42.6    8.4
+20000116    16 16-01-2000  40.5   0  25.3   0    0.0   0  11.2   0  29.2   42  10.1   0   13.3   31.3    8.8
+20000117    17 17-01-2000  38.5   0  24.0   0    0.0   0  12.0   0  17.6   42  16.4   0   24.1   55.0    6.6
+20000118    18 18-01-2000  42.1   0  23.2   0    0.0   0  12.4   0  24.2   42  13.0   0   15.8   45.7    8.2
+20000119    19 19-01-2000  32.3   0  18.9   0    0.0   0  10.4   0  31.8   42  15.8   0   32.7   72.4    7.2
+20000120    20 20-01-2000  30.0   0  18.2   0    0.0   0  14.2   0  32.3   42  15.7   0   37.0   75.2    6.9
+20000121    21 21-01-2000  26.0   0  13.4   0    0.0   0   9.2   0  27.2   42  12.0   0   35.7   78.1    5.6
+20000122    22 22-01-2000  25.2   0  11.4   0    0.0   0  10.8   0  31.6   42   8.0   0   25.0   59.4    6.2
+20000123    23 23-01-2000  25.1   0   9.0   0    0.0   0   9.6   0  32.7   42   8.3   0   26.1   72.3    6.1
+20000124    24 24-01-2000  24.0   0  13.4   0    0.0   0   4.4   0  16.7   42   7.3   0   24.5   47.5    4.8
+20000125    25 25-01-2000  28.5   0  14.7   0    2.2   0   9.0   0   8.4   42  13.8   0   35.5   82.6    3.6
+20000126    26 26-01-2000  29.8   0  17.5   0    7.2   0   9.6   0  21.1   42  20.4   0   48.6  100.0    4.8
+20000127    27 27-01-2000  26.1   0  17.0   0    1.6   0   8.2   0  18.7   42  12.5   0   37.0   64.5    4.8
+20000128    28 28-01-2000  27.5   0  12.0   0    0.0   0  10.0   0  32.3   42  10.2   0   27.8   72.8    6.5
+20000129    29 29-01-2000  28.7   0  12.2   0    0.0   0   9.8   0  32.0   42  11.7   0   29.7   82.4    6.5

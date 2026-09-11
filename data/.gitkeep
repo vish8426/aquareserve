@@ -1,0 +1,3 @@
+# Keeps the data/ directory in version control.
+# Large/downloaded climate files (data/raw/, *.csv, *.nc) are git-ignored;
+# The Phase 1 weather loader populates them locally.
