@@ -16,7 +16,7 @@ export default function Landing({ onEnter }: { onEnter: (tab?: string) => void }
         </div>
         <div className="hero-render">
           <InstallScene3D />
-          <div className="hero-caption">AquaReserve</div>
+          <div className="hero-caption"></div>
         </div>
       </div>
 
