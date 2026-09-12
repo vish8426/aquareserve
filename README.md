@@ -59,7 +59,7 @@ Schedule a finite reserve across zones and crop growth stages, given uncertain w
 
 It compares irrigation **control strategies** (from rainfed baseline up to Model Predictive Control with an Extended Kalman Filter state estimator), quantifies the yield protected and water saved and feeds a **cost/ROI model** that tells a farmer whether the system pays for itself.
 
-> **Scope:** Simulation only - no physical hardware is built. The hardware layer (sensors, valves, pump, edge controller, LoRaWAN/MQTT comms) is *modeled* inside the twin. See [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md).
+> **Scope:** The farm-scale system is simulation only - no production hardware is deployed to a real farm. The farm hardware layer (sensors, valves, pump, edge controller, LoRaWAN/MQTT comms) is *modeled* inside the twin. A model-scale **tabletop demonstrator was built** to validate the sense decide actuation loop against a real probe, a real pump and a real finite reserve; see [`docs/DEMO_BUILD_GUIDE.md`](docs/DEMO_BUILD_GUIDE.md). See [`docs/PROJECT_PLAN.md`](docs/PROJECT_PLAN.md).
 
 ## Impact
 Full rainfall replacement is physically infeasible for broadacre cereals - the storage volume required is enormous. So AquaReserve does **precision reserve management**, not full backup:
