@@ -98,8 +98,10 @@ Format: *Decision - Context - Reasoning - Consequences*.
 - **Decision:** Benchmark controllers against 
   - (a) a **perfect-foresight optimisation "oracle"** (CasADi) that sees the true future weather and 
   - (b) a **reinforcement-learning** policy (Gymnasium + Stable-Baselines3).
-- **Context:** The core claim is "smart control preserves yield under uncertainty" - which needs both a lower bound (baselines) and an upper bound (oracle) to be meaningful.
-- **Reasoning:** The oracle quantifies the *cost of forecast uncertainty* (gap between realistic control and the unattainable optimum) - a rigorous, cheap thesis result. 
+- **Context:** The core claim is "smart control preserves yield under uncertainty" - which needs a lower bound (the baselines) and a reference point that isolates how much of the remaining gap is caused by *forecast uncertainty* rather than by the controller.
+- **Reasoning:** The oracle quantifies the **cost of forecast uncertainty**: it runs the same receding-horizon formulation and the same objective as the deployable MPC, with the forecast replaced by the realised weather. The difference between the two is therefore attributable to forecast error alone, which is the comparison worth making. <br>
+- **Update:** The results matrix disproves, the oracle shares the deployable controller's finite planning horizon and linear objective so perfect knowledge of the future does not make it a globally optimal plan. <br>
+In nine cells of the matrix a deployable controller beats it. For example at 5 ML in the normal season the robust MPC reaches 248.2t against the oracle's 233.3t, and at 40ML in the severe season it reaches 246.8t against 245.7t. The pattern is concentrated where the reserve is small relative to demand. This verifies the horizon truncation. The oracle should be read as **"the same controller, with forecast error removed"**, not as a ceiling. At the 20ML design point on the severe season it does bound the deployable set, which is why the headline "MPC captures 94% of the oracle" claim remains valid for that specific cell. 
   - RL provides an AI-engineering technique and an alternative-policy comparison, aligning with the system's AI emphasis and current (2024-25) irrigation-control literature. 
   - CasADi is already a do-mpc dependency, so the oracle reuses existing tooling.
 - **Consequences:** RL adds training/tuning effort - scheduled after the MVP and scoped as a comparison, not a dependency of the core system.
@@ -330,6 +332,38 @@ Production is not strictly lower under severe than under moderate for every cont
 **Economics:** The investment case is robust to the assumptions growers worry about most. Base payback is 1.76-1.90 years with a ten-year NPV of AUD 340,000-375,000. Across a crop-price swing of plus or minus 20% MPC payback moves only between 1.47 and 2.24 years; NPV stays strongly positive even at a 12% discount rate (about AUD 275,000 for MPC); and because the system earns most of its return in drought years, a higher assumed drought frequency shortens payback further. MPC and robust MPC are the strongest economically throughout.
 
 **Conclusion:** An MPC-family controller is the researched best deployment: it protects the most yield of any realisable strategy, comes closest to the oracle ceiling and delivers the strongest, most robust economics. The reserve should be sized around 20ML.
+
+## 6.11 Evaluation Design & Known Limitations of the Evaluation
+This section states how the evaluation set was chosen, what it does and does not cover and where the system is weakest.
+
+### 6.11.1 How Evaluation Set was Determined
+**Seasons:** Two real Mildura seasons are used rather than synthetic weather, so the results cannot be accused of being tuned to a generator. **Normal is the real 2000 season** (about 161mm growing-season rain) and **severe is the real 2019 drought** (about 90mm). 2019 was selected because it is the driest growing season in the committed SILO record for station 76031, so it is the hardest real case available rather than a convenient one. 2000 was selected as a near-median season from the same station, giving a contrasting pair on identical soil, crops and calendar. A third **synthetic moderate** case (a 30% rainfall cut) is used only in the sensitivity study to give a mid-point; it is clearly labelled as synthetic wherever it appears.
+
+**Reserve Sizes:** Seven sizes from 5 to 40ML bracket the 20ML design point by a factor of four either way. The range was chosen to expose the shape of the response curve not to flatter it: 5ML is deliberately too small for the farm 40ML is deliberately larger than a grower would fund.
+
+**Controllers:** All seven run on identical weather, soil, crop and reserve inputs. No controller sees a tuned scenario that the others do not.
+
+**Independent Reference:** The engine itself is validated against `pyfao56`, a published third-party implementation of FAO-56. Testing the engine against my own expectations only proves self-consistency. Potential crop evapo-transpiration agrees to 0.0%.
+
+For the physical engine there is no train/test split to make because nothing is fitted to the evaluation data. The model is parameterised from published FAO coefficients not learned. The exception is the RL policy, discussed below.
+
+### 6.11.2 The Oracle is not Upper Bound
+The oracle removes forecast error but keeps the same finite horizon and linear objective as the deployable MPC. In 9 of 98 matrix cells a deployable controller beats it, concentrated at small reserves where horizon truncation costs most. It bounds the deployable set at the 20ML severe design point, which is the cell the headline result quotes.
+
+### 6.11.3 The RL Policy is Evaluated on Training Seasons
+The CEM-trained policy in `rl/_pretrained.py` was trained on the real 2000 and real 2019 seasons (`scripts/train_rl.py`) and those are the same two seasons it is then evaluated on. **This is train/test leakage and the reported RL numbers are therefore optimistic.**
+
+Even with that advantage the policy reaches 184.0t on severe 2019 against MPC's 213.0t. A result biased in RL's favour that still loses is stronger evidence for the model-based approach than a clean comparison would have been. A correct evaluation would train on a disjoint set of seasons from the multi-decade SILO record; that is scoped as future work and requires the fuller weather record fetched by `scripts/fetch_silo.py`.
+
+### 6.11.4 Where the System is Weakest
+| Weakness                                      | Evidence                                                                                          | Interpretation                                                                                                                                                        |
+|---                                            |---                                                                                                |---                                                                                                                                                                    |
+| RL Cannot Exploit Larger Reserve              | 169.2t at 5ML rising to only 188.6t at 40ML against MPC's 183.5 to 241.5t                         | The learned policy is myopic: it spends water early and gains almost nothing from extra storage. Every model-based controller gains 60 to 80t across the same range.  | 
+| Headline Cell over Plain MPC                  | Robust MPC beats plain MPC in 9 of 14 cells but loses at exactly 20ML severe (211.9 vs 213.0t)    | The 213t headline is MPC's best cell. Robust MPC is the better general purpose choice.                                                                                |
+| Threshold & Smart-Stage tie on Yield          | 195.8 vs 195.6t at 20ML severe                                                                    | They separate on reserve longevity instead, 103 vs 144 days.                                                                                                          |
+| Control Matters least when Water is Plentiful | MPC beats threshold by 20.7t at 5ML, narrowing to 12.8t at 40ML                                   | The value of optimisation is inversely related to how much slack the reserve has. Farmer afford abundant storage needs this system least.                             |
+| Agronomic Calibration is First-Pass           | Rainfed wheat 2.0t/ha normal against the published Mallee dryland average                         | Sanity checked, not cross-validated against real harvest records over multiple years.                                                                                 |
+| Single Farm, Single Region                    | One 24ha mixed farm at Mildura                                                                    | Nothing demonstrates transfer to other soils, climates or crop mixes. The engine is config-driven so transfer is plausible but is untested.                           |
 
 ## 7. Decisions Locked & Open Items
 **Locked (with the Product Owner):** Balanced, MVP-first delivery; own transparent engine validated vs pyfao56 + AquaCrop-OSPy; EKF **and** EnKF estimators; MPC +

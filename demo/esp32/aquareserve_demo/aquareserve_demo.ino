@@ -34,8 +34,8 @@ const char* ZONE = "tray-1";
 // ADC reading in wet mix (calibrate once)
 const int   SOIL_PIN = 4;     
 const int   PUMP_PIN = 5;     
-const int   RAW_DRY  = 2400;   
-const int   RAW_WET  = 2300;   
+const int   RAW_DRY  = 2200;   
+const int   RAW_WET  = 2100;   
 
 // check each minute (shorten for a live demo)
 // offline fallback threshold
