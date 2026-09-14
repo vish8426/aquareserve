@@ -15,10 +15,11 @@ Every component the Quantic Capstone submission requires, with its link.
 | Deployed Web Application              | [aquareserve-hym8.onrender.com](https://aquareserve-hym8.onrender.com) - see **Live Application** below for the two apps and the twins                      |
 | Agile Task Board                      | [github.com/vish8426/projects](https://github.com/users/vish8426/projects/4) - shared with `quantic-grader`                                                 |
 | Design & Testing Document             | [Word Edition](docs/AquaReserve-Design-and-Testing-Document.docx) - Markdown source: [`docs/DESIGN_AND_TESTING.md`](docs/DESIGN_AND_TESTING.md)             |
-| Recorded Demonstration (15 to 20 min) | TBA-BEFORE-SUBMIT                                                                                                                                           |
+| Recorded Demonstration (15 to 20 min) | [Google Drive](https://drive.google.com/drive/folders/1-MuKZYEpX1ILMJCBDUZmipLPyPT_Th8O)                                                                                                                                           |
 | CI/CD Pipeline                        | [GitHub Actions](https://github.com/vish8426/aquareserve/actions/workflows/ci.yml) - lint, tests across Python 3.10 to 3.12, web app builds, Render deploy  |
 | Product Backlog (User Stories)        | [`docs/BACKLOG.md`](docs/BACKLOG.md)                                                                                                                        |
 | Comparison & Sensitivity Study        | [Word Report](docs/AquaReserve-Comparison-and-Sensitivity-Study.docx)                                                                                       |
+| AI Tooling Disclosure                 | [`AI-TOOLING.md`](AI-TOOLING.md) - which AI tools were used, how and what they got wrong                                                                    |
 
 ## Live Application
 Everything runs from one Render service. Free tier, so the first request after a quiet period takes about 50 seconds to wake.
